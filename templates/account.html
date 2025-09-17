@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Мой аккаунт</h2>
+
+{% if orders %}
+    <h3>История заказов</h3>
+    <ul>
+    {% for cat in orders %}
+        <li>{{ cat.name }} — цвет: {{ cat.color }} — цена: {{ cat.price }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Вы ещё не заказывали котов.</p>
+{% endif %}
+{% endblock %}

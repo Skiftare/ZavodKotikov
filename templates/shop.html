@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Генератор котов</h2>
+<p>Создайте своего уникального кота и добавьте его в заказы!</p>
+
+<form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <label>Имя кота:</label><br>
+    <input type="text" name="name" required><br><br>
+
+    <label>Цвет:</label><br>
+    <select name="color">
+        <option value="Белый">Белый</option>
+        <option value="Черный">Черный</option>
+        <option value="Рыжий">Рыжий</option>
+        <option value="Серый">Серый</option>
+    </select><br><br>
+
+    <label>Цена (XML):</label><br>
+    <input type="text" name="price" value="10 XML"><br><br>
+
+    <button type="submit" class="btn">Создать кота</button>
+</form>
+{% endblock %}

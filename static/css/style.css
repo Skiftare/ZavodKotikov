@@ -1,0 +1,87 @@
+/* Цвета в стиле Material You */
+:root {
+  --primary: #6750a4;
+  --on-primary: #ffffff;
+  --secondary: #625b71;
+  --on-secondary: #ffffff;
+  --background: #fef7ff;
+  --surface: #ffffff;
+  --on-surface: #1c1b1f;
+  --outline: #79747e;
+}
+
+body {
+  margin: 0;
+  font-family: "Roboto", sans-serif;
+  background: var(--background);
+  color: var(--on-surface);
+}
+
+/* Шапка */
+.app-bar {
+  background: var(--primary);
+  color: var(--on-primary);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.app-bar nav a {
+  color: var(--on-primary);
+  margin-left: 1.5rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.app-bar nav a:hover {
+  text-decoration: underline;
+}
+
+/* Контейнер */
+.container {
+  padding: 2rem;
+}
+
+/* Карточки */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--outline);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.btn {
+  background: var(--secondary);
+  color: var(--on-secondary);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+/* Подвал */
+.footer {
+  margin-top: 2rem;
+  padding: 1rem;
+  text-align: center;
+  background: var(--surface);
+  border-top: 1px solid var(--outline);
+}
+
+.hero-cat {
+  margin-top: 1rem;
+  max-width: 300px;
+  border-radius: 12px;
+}
