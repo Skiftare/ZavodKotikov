@@ -1,25 +1,97 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Генератор котов</h2>
-<p>Создайте своего уникального кота и добавьте его в заказы!</p>
+<h2 class="page-title">Генератор котов</h2>
+<p class="subtitle">Создайте своего уникального кота: выберите параметры — и увидите кота в окне предпросмотра.</p>
 
-<form method="post">
+<div class="shop-layout">
+  <!-- Превью -->
+  <div class="preview card">
+    <div class="preview-box">
+      <img
+        src="{{ cat_img_url or url_for('static', filename='placeholder.png') }}"
+        alt="Предпросмотр кота"
+        class="preview-img"
+      />
+    </div>
+  </div>
+
+  <!-- Форма -->
+  <form method="post" class="card form-card" id="cat-form">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="preview" id="action-field">
 
-    <label>Имя кота:</label><br>
-    <input type="text" name="name" required><br><br>
+    <label>Имя кота</label>
+    <input type="text" name="name" value="{{ form_data.name or '' }}" placeholder="Барсик" required>
 
-    <label>Цвет:</label><br>
-    <select name="color">
-        <option value="Белый">Белый</option>
-        <option value="Черный">Черный</option>
-        <option value="Рыжий">Рыжий</option>
-        <option value="Серый">Серый</option>
-    </select><br><br>
+    <label>Порода</label>
+    <select name="breed" required>
+      {% set b = form_data.breed %}
+      <option value="Британец"  {{ 'selected' if b=='Британец'  else '' }}>Британец</option>
+      <option value="Сиамская"  {{ 'selected' if b=='Сиамская'  else '' }}>Сиамская</option>
+      <option value="Персидская"{{ 'selected' if b=='Персидская'else '' }}>Персидская</option>
+      <option value="Сфинкс"    {{ 'selected' if b=='Сфинкс'    else '' }}>Сфинкс</option>
+    </select>
 
-    <label>Цена (XML):</label><br>
-    <input type="text" name="price" value="10 XML"><br><br>
+    <label>Цвет</label>
+    <select name="color" required>
+      {% set c = form_data.color %}
+      <option value="Черный" {{ 'selected' if c=='Черный' else '' }}>Черный</option>
+      <option value="Белый"  {{ 'selected' if c=='Белый'  else '' }}>Белый</option>
+      <option value="Серый"  {{ 'selected' if c=='Серый'  else '' }}>Серый</option>
+      <option value="Бежевый"{{ 'selected' if c=='Бежевый'else '' }}>Бежевый</option>
+    </select>
 
-    <button type="submit" class="btn">Создать кота</button>
-</form>
+    <label>Ушки</label>
+    <select name="ears" required>
+      {% set e = form_data.ears %}
+      <option value="Острые в разные стороны" {{ 'selected' if e=='Острые в разные стороны' else '' }}>Острые в разные стороны</option>
+      <option value="Стоячие"                  {{ 'selected' if e=='Стоячие'                  else '' }}>Стоячие</option>
+      <option value="Скругленные"              {{ 'selected' if e=='Скругленные'              else '' }}>Скругленные</option>
+    </select>
+
+    <label>Лапки</label>
+    <select name="paws" required>
+      {% set p = form_data.paws %}
+      <option value="В цвет"        {{ 'selected' if p=='В цвет'        else '' }}>В цвет</option>
+      <option value="Белые лапки"   {{ 'selected' if p=='Белые лапки'   else '' }}>Белые лапки</option>
+    </select>
+
+    <!-- НЕИЗМЕНЯЕМАЯ ЦЕНА -->
+    <div class="price-box" aria-live="polite">
+      <div class="price-label">Стоимость</div>
+      <div class="price-value">{{ price }}</div>
+    </div>
+
+    <div class="actions">
+      <button type="submit"
+              class="btn btn--block btn--lg"
+              name="action" value="add"
+              onclick="document.getElementById('action-field').value='add'">
+        Добавить в корзину
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Автосабмит при изменениях (предпросмотр + пересчёт цены)
+  (function () {
+    const form = document.getElementById('cat-form');
+    const actionField = document.getElementById('action-field');
+    let t;
+
+    function scheduleSubmit() {
+      clearTimeout(t);
+      actionField.value = 'preview';
+      t = setTimeout(() => form.submit(), 300);
+    }
+
+    form.querySelectorAll('select, input[name="name"]').forEach(el => {
+      el.addEventListener('change', scheduleSubmit);
+      if (el.tagName.toLowerCase() === 'input') {
+        el.addEventListener('input', scheduleSubmit);
+      }
+    });
+  })();
+</script>
 {% endblock %}

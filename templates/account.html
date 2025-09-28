@@ -1,15 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Мой аккаунт</h2>
+<h2>Корзина</h2>
 
-{% if orders %}
-    <h3>История заказов</h3>
-    <ul>
+{% if orders and orders|length %}
+  <ul>
     {% for cat in orders %}
-        <li>{{ cat.name }} — цвет: {{ cat.color }} — цена: {{ cat.price }}</li>
+      <li>
+        {{ cat.name }} — Порода: {{ cat.breed }}, Цвет: {{ cat.color }}, Ушки: {{ cat.ears }}, Лапки: {{ cat.paws }}
+      </li>
     {% endfor %}
-    </ul>
+  </ul>
 {% else %}
-    <p>Вы ещё не заказывали котов.</p>
+  <p>Ваша корзина пуста.</p>
 {% endif %}
 {% endblock %}
