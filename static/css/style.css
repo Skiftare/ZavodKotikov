@@ -1,8 +1,8 @@
 /* Цвета в стиле Material You */
 :root {
-  --primary: #6750a4;
-  --on-primary: #ffffff;
-  --secondary: #625b71;
+  --primary: #e3c7c3;
+  --on-primary: #1c1b1f;
+  --secondary: #8b8b8b;
   --on-secondary: #ffffff;
   --background: #fef7ff;
   --surface: #ffffff;
@@ -237,4 +237,12 @@ body {
   font-size: 1.4rem;                    /* крупнее */
   font-weight: 700;
   line-height: 1.2;
+}
+
+/* Шрифт только для шапки */
+.app-bar,
+.app-bar nav a {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-weight: 600;      /* толщина */
+  letter-spacing: .01em; /* необязательно */
 }
