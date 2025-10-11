@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="payment-container">
+    <h2>Оплата заказа</h2>
+
+    <!-- Контейнер для уведомлений -->
+    <div id="notification" class="notification"></div>
+
+    <div class="order-summary">
+        <h3>Ваш заказ:</h3>
+        <ul class="order-items">
+            {% for item in order.items %}
+            <li>
+                {{ item.name }} ({{ item.breed }})
+                <br>
+                Цвет: {{ item.color }}, Ушки: {{ item.ears }}, Лапки: {{ item.paws }}
+            </li>
+            {% endfor %}
+        </ul>
+
+        <div class="total">
+            <strong>Итого к оплате:</strong> {{ order.total_amount }} XML
+        </div>
+    </div>
+
+    <div class="payment-details">
+        <div class="crypto-address">
+            <h4>Адрес для оплаты:</h4>
+            <code class="wallet">XMLCoin_12345678abcdef</code>
+            <button onclick="copyToClipboard('.wallet')" class="copy-btn">Копировать</button>
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('confirm_payment', order_id=order.id) }}" class="payment-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-group">
+            <label for="email">Email для получения NFT:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="transaction_id">ID транзакции:</label>
+            <input type="text" id="transaction_id" name="transaction_id" required>
+            <small>Укажите ID транзакции после отправки XML</small>
+        </div>
+
+        <button type="submit" class="btn-confirm">Подтвердить оплату</button>
+    </form>
+</div>
+
+<script>
+function showNotification(message, type = 'success') {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.className = `notification notification--${type} notification--show`;
+
+    setTimeout(() => {
+        notification.classList.remove('notification--show');
+    }, 3000);
+}
+
+function copyToClipboard(selector) {
+    const text = document.querySelector(selector).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        showNotification('Адрес скопирован в буфер обмена!');
+    }).catch(() => {
+        showNotification('Не удалось скопировать адрес', 'error');
+    });
+}
+</script>
+
+<style>
+.payment-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+}
+
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateX(400px);
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
+    max-width: 300px;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.notification--show {
+    transform: translateX(0);
+}
+
+.notification--success {
+    background: #4CAF50;
+    color: white;
+}
+
+.notification--error {
+    background: #f44336;
+    color: white;
+}
+
+.order-summary {
+    margin: 20px 0;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.order-items {
+    list-style: none;
+    padding: 0;
+}
+
+.order-items li {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.order-items li:last-child {
+    border-bottom: none;
+}
+
+.total {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px solid #ddd;
+    font-size: 18px;
+}
+
+.payment-details {
+    margin: 20px 0;
+}
+
+.crypto-address {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.wallet {
+    display: inline-block;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 10px 0;
+    font-family: monospace;
+}
+
+.payment-form {
+    margin-top: 30px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.form-group small {
+    color: #666;
+    font-size: 12px;
+}
+
+.btn-confirm {
+    background: #4CAF50;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+}
+
+.btn-confirm:hover {
+    background: #45a049;
+}
+
+.copy-btn {
+    margin-left: 10px;
+    padding: 8px 16px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.copy-btn:hover {
+    background: #0056b3;
+}
+
+/* Адаптив для мобильных */
+@media (max-width: 600px) {
+    .notification {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
+</style>
+{% endblock %}

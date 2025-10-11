@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="success-container">
+    <img src="{{ url_for('static', filename='img/images.jpg') }}" alt="Success" class="success-icon">
+    <!-- <div class="success-icon">✅</div> -->
+
+    <h2>Оплата успешно подтверждена!</h2>
+
+    <div class="order-info">
+        <p>Ваш заказ #{{ order.id[:8] }} был успешно оплачен.</p>
+        <p>NFT-коты будут отправлены на email: <strong>{{ order.email }}</strong></p>
+
+        <div class="order-items">
+            <h3>Ваши коты:</h3>
+            <ul>
+                {% for item in order.items %}
+                <li>{{ item.name }} ({{ item.breed }})</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <a href="{{ url_for('index') }}" class="btn btn-primary">На главную</a>
+</div>
+
+<style>
+    .success-container {
+        max-width: 600px;
+        margin: 50px auto;
+        text-align: center;
+        padding: 30px;
+    }
+
+    .success-icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+    }
+
+    .order-info {
+        background: #f0f8ff;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 30px 0;
+    }
+
+    .order-items {
+        margin-top: 20px;
+        text-align: left;
+    }
+
+    .order-items ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .order-items li {
+        padding: 8px 0;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .order-items li:last-child {
+        border-bottom: none;
+    }
+
+    .btn-primary {
+        display: inline-block;
+        padding: 12px 30px;
+        background: #4CAF50;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-top: 20px;
+    }
+
+    .btn-primary:hover {
+        background: #45a049;
+    }
+</style>
+{% endblock %}
