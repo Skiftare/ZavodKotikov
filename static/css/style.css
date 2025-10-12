@@ -23,24 +23,59 @@ body {
   color: var(--on-primary);
   padding: 1rem 2rem;
   display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between; /* Лого слева, навигация справа */
+  align-items: center;
+  width: 100%; /* Занимает всю доступную ширину */
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.nav-container {
+  display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.app-bar nav {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  margin: 0;
+  padding: 0;
 }
 
 .app-bar nav a {
   color: var(--on-primary);
-  margin-left: 1.5rem;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 1000;
+  white-space: nowrap;
 }
 
 .app-bar nav a:hover {
   text-decoration: underline;
 }
 
+/* Логотип - убираем любые отступы */
+.logo {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
 /* Контейнер */
 .container {
   padding: 2rem;
+  max-width: 100%; /* ← Важно: снимаем ограничение максимальной ширины */
+  margin: 0 auto;
 }
 
 /* Карточки */
@@ -245,4 +280,20 @@ body {
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   font-weight: 600;      /* толщина */
   letter-spacing: .01em; /* необязательно */
+}
+
+.header-banner {
+    width: 100%;
+    background: #fef7ff;
+    text-align: center;
+    overflow: hidden; /* Обрезает выходящие за границы части */
+}
+
+.header-banner img {
+    width: 100%;
+    height: auto;
+    min-height: 100px; /* Минимальная высота */
+    max-height: 400px; /* Максимальная высота */
+    object-fit: cover; /* Заполняет область без искажений */
+    display: block;
 }
