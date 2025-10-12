@@ -56,16 +56,6 @@ def index():
 def about():
     return render_template("about.html", title="О нас")
 
-def _ensure_layer_or_fallback(filename: str) -> str:
-    """Вернёт путь к слою, если есть; иначе путь к special.png (если и его нет — 404)."""
-    candidate = os.path.join(LAYERS_DIR, filename)
-    if os.path.isfile(candidate):
-        return candidate
-    if os.path.isfile(SPECIAL_IMG):
-        return SPECIAL_IMG
-    # если и фолбэк отсутствует — бросаем 404
-    raise NotFound("Ни слой, ни special.png не найдены")
-
 def _slug(s: str) -> str:
     return s.strip().lower().replace(" ", "-")
 
@@ -104,16 +94,19 @@ def _cat_layer_paths(breed: str, color: str, ears: str, paws: str, container: st
         if os.path.isfile(p):
             paths.append(p)
         else:
+            print(f"ERROR! LAYER {LAYERS_DIR} {fn} NOT FOUND!")
             missing = True  # какого-то слоя не хватает
 
-    print(filenames)
+    print("Requested files list: ", filenames)
 
     # если вообще ничего не нашли, но есть special — отдаём только special
     if not paths and os.path.isfile(SPECIAL_IMG):
+        print("ERROR! NO IMAGES!")
         return [SPECIAL_IMG]
 
     # если чего-то не хватает и special существует — кладём special поверх всех
     if missing and os.path.isfile(SPECIAL_IMG):
+        print("ERROR! LAYER(S) NOT FOUND!")
         paths.append(SPECIAL_IMG)
 
     if not paths:

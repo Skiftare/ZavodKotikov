@@ -45,10 +45,9 @@
     <select name="ears" required>
       {% set e = form_data.ears %}
       <option value="Острые в разные стороны" {{ 'selected' if e=='Острые в разные стороны' else '' }}>Острые в разные стороны</option>
-      <option value="Стоячие"                  {{ 'selected' if e=='Стоячие'                  else '' }}>Стоячие</option>
+      <option value="Круглые"                  {{ 'selected' if e=='Круглые'                  else '' }}>Круглые</option>
       <option value="Скругленные"              {{ 'selected' if e=='Скругленные'              else '' }}>Скругленные</option>
     </select>
-
     <label>Лапки</label>
     <select name="paws" required>
       {% set p = form_data.paws %}
