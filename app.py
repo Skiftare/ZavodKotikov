@@ -83,14 +83,18 @@ def _cat_layer_paths(breed: str, color: str, ears: str, paws: str, container: st
     breed_fn = f"{_slug(breed)}.png"
     color_fn = f"{_slug(color)}.png"
     ears_fn  = f"{_slug(ears)}.png"
-    container_fn = f"{_slug(container)}.png"
 
-    filenames = [ears_fn, color_fn, breed_fn, container_fn]
+    filenames = [ears_fn, color_fn, breed_fn]
 
     # лапы добавляем только если они НЕ "в цвет"
     if _slug(paws) != "в-цвет":
         paws_fn = f"{_slug(paws)}.png"
         filenames.append(paws_fn)
+
+    # контейнер тоже с условием
+    if _slug(container) != "без-контейнера":
+        container_fn = f"{_slug(container)}.png"
+        filenames.append(container_fn)
 
     paths: list[str] = []
     missing = False
