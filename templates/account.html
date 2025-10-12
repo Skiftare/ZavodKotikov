@@ -3,23 +3,14 @@
 <h2>Корзина</h2>
 
 {% if orders and orders|length %}
-<ul>
+  <ul>
     {% for cat in orders %}
-    <li>
-        <img src="{{ cat.image }}" alt="{{ cat.name }}"
-             style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; vertical-align: middle;">
-
-        {{ cat.name }} — Порода: {{ cat.breed }}, Цвет: {{ cat.color }},
-        Ушки: {{ cat.ears }}, Лапки: {{ cat.paws }}
-    </li>
+      <li>
+        {{ cat.name }} — Порода: {{ cat.breed }}, Цвет: {{ cat.color }}, Ушки: {{ cat.ears }}, Лапки: {{ cat.paws }}
+      </li>
     {% endfor %}
-</ul>
-
-<form method="POST" action="{{ url_for('checkout') }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <button type="submit">Оформить заказ</button>
-</form>
+  </ul>
 {% else %}
-<p>Ваша корзина пуста.</p>
+  <p>Ваша корзина пуста.</p>
 {% endif %}
 {% endblock %}
