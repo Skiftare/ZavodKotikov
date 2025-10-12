@@ -37,6 +37,8 @@ class OrderService:
             diffs += 1
         if item.paws.lower() != "в цвет":
             diffs += 1
+        if item.container.lower() != "без контейнера":
+            diffs += 1
 
         return base_price + 5 * diffs
     def calculate_price(self, item: OrderItem) -> int:

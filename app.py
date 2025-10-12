@@ -1,7 +1,9 @@
 import os
 import secrets
 import uuid
+from image_generator import compose_file
 from datetime import timedelta
+from werkzeug.exceptions import NotFound
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 
@@ -16,7 +18,8 @@ order_service = OrderService(payment_gateway)
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
 app.permanent_session_lifetime = timedelta(days=7)
-
+LAYERS_DIR = os.path.join(app.root_path, "static", "cats", "layers")
+SPECIAL_IMG = os.path.join(app.root_path, "static", "cats", "special.png")
 
 def generate_csrf_token():
     if "_csrf_token" not in session:
@@ -27,8 +30,7 @@ def generate_csrf_token():
 app.jinja_env.globals["csrf_token"] = generate_csrf_token
 
 
-def compute_price(breed: str, color: str, ears: str, paws: str) -> str:
-
+def compute_price(breed: str, color: str, ears: str, paws: str, container: str) -> str:
     temp_item = OrderItem(
         cat_id=str(uuid.uuid4()),
         name="",
@@ -36,10 +38,12 @@ def compute_price(breed: str, color: str, ears: str, paws: str) -> str:
         color=color,
         ears=ears,
         paws=paws,
-        price=0
+        price=0,
+        container=container
     )
     price = order_service.calculate_price(temp_item)
     return f"{price} XML"
+
 
 
 
@@ -52,26 +56,78 @@ def index():
 def about():
     return render_template("about.html", title="О нас")
 
+def _ensure_layer_or_fallback(filename: str) -> str:
+    """Вернёт путь к слою, если есть; иначе путь к special.png (если и его нет — 404)."""
+    candidate = os.path.join(LAYERS_DIR, filename)
+    if os.path.isfile(candidate):
+        return candidate
+    if os.path.isfile(SPECIAL_IMG):
+        return SPECIAL_IMG
+    # если и фолбэк отсутствует — бросаем 404
+    raise NotFound("Ни слой, ни special.png не найдены")
 
-def build_cat_image_path(breed: str, color: str, ears: str, paws: str) -> str:
+def _slug(s: str) -> str:
+    return s.strip().lower().replace(" ", "-")
+
+def _cat_layer_paths(breed: str, color: str, ears: str, paws: str, container: str) -> list[str]:
     """
-    Формируем имя файла по выбранным параметрам и проверяем его наличие.
-    Если файла нет, возвращаем URL специальной картинки 'cats/special.png'.
+    Слои в порядке наложения:
+      1) <порода>-<цвет>.png
+      2) <уши>.png
+      3) <лапы>.png (если лапы != 'в цвет')
+    Если отсутствует хотя бы один из нужных слоёв — добавляем SPECIAL_IMG поверх.
+    Если не найден ни один слой и есть SPECIAL_IMG — возвращаем только SPECIAL_IMG.
+    Если нет вообще ничего — 404.
     """
+    # формируем имена файлов
+    breed_fn = f"{_slug(breed)}.png"
+    color_fn = f"{_slug(color)}.png"
+    ears_fn  = f"{_slug(ears)}.png"
+    container_fn = f"{_slug(container)}.png"
 
-    def slug(s: str) -> str:
-        return s.strip().lower().replace(" ", "-")
+    filenames = [ears_fn, color_fn, breed_fn, container_fn]
 
-    fname = f"{slug(breed)}_{slug(color)}_{slug(ears)}_{slug(paws)}.png"
+    # лапы добавляем только если они НЕ "в цвет"
+    if _slug(paws) != "в-цвет":
+        paws_fn = f"{_slug(paws)}.png"
+        filenames.append(paws_fn)
 
-    # Абсолютный путь до файла в /static/cats/
-    abs_path = os.path.join(app.root_path, "static", "cats", fname)
+    paths: list[str] = []
+    missing = False
 
-    if os.path.isfile(abs_path):
-        return url_for("static", filename=f"cats/{fname}")
-    else:
-        # фолбэк
-        return url_for("static", filename="cats/special.png")
+    for fn in filenames:
+        p = os.path.join(LAYERS_DIR, fn)
+        if os.path.isfile(p):
+            paths.append(p)
+        else:
+            missing = True  # какого-то слоя не хватает
+
+    print(filenames)
+
+    # если вообще ничего не нашли, но есть special — отдаём только special
+    if not paths and os.path.isfile(SPECIAL_IMG):
+        return [SPECIAL_IMG]
+
+    # если чего-то не хватает и special существует — кладём special поверх всех
+    if missing and os.path.isfile(SPECIAL_IMG):
+        paths.append(SPECIAL_IMG)
+
+    if not paths:
+        # нет ни одного слоя и нет special — явная ошибка
+        raise NotFound("Слои не найдены, отсутствует и special.png")
+
+    return paths
+
+@app.route("/compose-cat.png")
+def compose_cat():
+    breed = request.args.get("breed", "Британец")
+    color = request.args.get("color", "Серый")
+    ears  = request.args.get("ears", "Острые в разные стороны")
+    paws  = request.args.get("paws", "В цвет")
+    container = request.args.get("container", "Без контейнера")
+
+    files = _cat_layer_paths(breed, color, ears, paws, container)
+    return compose_file(files)
 
 
 # Страница «Магазин»
@@ -85,8 +141,10 @@ def shop():
         "color": "Серый",
         "ears": "Острые в разные стороны",
         "paws": "В цвет",
+        "container": "Без контейнера",  # <— добавили
     }
-    price = compute_price(form_data["breed"], form_data["color"], form_data["ears"], form_data["paws"])
+    price = compute_price(form_data["breed"], form_data["color"], form_data["ears"], form_data["paws"],
+                          form_data["container"])
 
     if request.method == "POST":
         token = request.form.get("csrf_token")
@@ -99,13 +157,22 @@ def shop():
         color = request.form.get("color", form_data["color"])
         ears = request.form.get("ears", form_data["ears"])
         paws = request.form.get("paws", form_data["paws"])
+        container = request.form.get("container", form_data["container"])
         action = request.form.get("action", "preview")
 
-        form_data.update({"name": name, "breed": breed, "color": color, "ears": ears, "paws": paws})
+        form_data.update({"name": name, "breed": breed, "color": color, "ears": ears, "paws": paws,
+                          "container": container})
 
-        price = compute_price(breed, color, ears, paws)
+        price = compute_price(breed, color, ears, paws, container)
 
-        cat_img_url = build_cat_image_path(breed, color, ears, paws)
+        cat_img_url = url_for(
+            "compose_cat",
+            breed=breed,
+            color=color,
+            ears=ears,
+            paws=paws,
+            container=container
+        )
 
         if action == "add":
             cat = {
@@ -114,9 +181,11 @@ def shop():
                 "color": color,
                 "ears": ears,
                 "paws": paws,
+                "container": container,
                 "price": price,
                 "image": cat_img_url,
             }
+
             session.setdefault("orders", []).append(cat)
             session.modified = True
             flash(f"Кот '{cat['name']}' добавлен в корзину!", "success")
@@ -165,6 +234,7 @@ def checkout():
                     color=cat["color"],
                     ears=cat["ears"],
                     paws=cat["paws"],
+                    container=cat["container"],
                     price=price
                 )
             )

@@ -56,6 +56,13 @@
       <option value="Белые лапки"   {{ 'selected' if p=='Белые лапки'   else '' }}>Белые лапки</option>
     </select>
 
+    <label>Контейнер</label>
+    <select name="container" required>
+      {% set ct = form_data.container %}
+      <option value="Без контейнера" {{ 'selected' if ct=='Без контейнера' else '' }}>Без контейнера</option>
+      <option value="В контейнере"   {{ 'selected' if ct=='В контейнере'   else '' }}>В контейнере</option>
+    </select>
+
     <!-- НЕИЗМЕНЯЕМАЯ ЦЕНА -->
     <div class="price-box" aria-live="polite">
       <div class="price-label">Стоимость</div>
@@ -74,7 +81,7 @@
 </div>
 
 <script>
-  // Автосабмит при изменениях (предпросмотр + пересчёт цены)
+  // Автосабмит только при изменении селектов (предпросмотр + пересчёт цены)
   (function () {
     const form = document.getElementById('cat-form');
     const actionField = document.getElementById('action-field');
@@ -86,11 +93,15 @@
       t = setTimeout(() => form.submit(), 300);
     }
 
-    form.querySelectorAll('select, input[name="name"]').forEach(el => {
+    // ВАЖНО: слушаем только select'ы
+    form.querySelectorAll('select').forEach(el => {
       el.addEventListener('change', scheduleSubmit);
-      if (el.tagName.toLowerCase() === 'input') {
-        el.addEventListener('input', scheduleSubmit);
-      }
+    });
+
+    // На всякий случай — Enter в поле имени не сабмитит форму
+    const nameInput = form.querySelector('input[name="name"]');
+    nameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') e.preventDefault();
     });
   })();
 </script>
