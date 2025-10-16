@@ -22,9 +22,7 @@
 
             <nav>
                 <a href="{{ url_for('index') }}">Главная</a>
-                <a href="{{ url_for('about') }}">О нас</a>
                 <a href="{{ url_for('shop') }}">Конфигуратор</a>
-
                 <a href="{{ url_for('account') }}" class="cart-link">
                     Корзина <span class="cart-badge">{{ (session.get('orders', [])|length) or 0 }}</span>
                 </a>
