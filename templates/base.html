@@ -4,23 +4,31 @@
     <meta charset="UTF-8">
     <title>{{ title }} | Завод котов</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
 </head>
 <body>
-    <header class="app-bar">
-        <a class="logo" href="{{ url_for('index') }}" aria-label="На главную">
-          <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Завод котиков" height="28">
+    <!-- Шапка-баннер -->
+    <div class="header-banner">
+        <a class="banner-link" href="{{ url_for('index') }}" aria-label="На главную">
+            <img src="{{ url_for('static', filename='img/site-header.png') }}" alt="Завод котиков">
         </a>
+    </div>
 
-        <nav>
-          <a href="{{ url_for('index') }}">Главная</a>
-          <a href="{{ url_for('about') }}">О нас</a>
-          <a href="{{ url_for('shop') }}">Конфигуратор</a>
+    <!-- Навигационная панель -->
+    <header class="app-bar">
+        <div class="nav-container">
+            <a class="logo" href="{{ url_for('index') }}" aria-label="На главную">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Завод котиков" height="28">
+            </a>
 
-          <!-- Новая кнопка Корзина -->
-          <a href="{{ url_for('account') }}" class="cart-link">
-            Корзина <span class="cart-badge">{{ (session.get('orders', [])|length) or 0 }}</span>
-          </a>
-        </nav>
+            <nav>
+                <a href="{{ url_for('index') }}">Главная</a>
+                <a href="{{ url_for('shop') }}">Конфигуратор</a>
+                <a href="{{ url_for('account') }}" class="cart-link">
+                    Корзина <span class="cart-badge">{{ (session.get('orders', [])|length) or 0 }}</span>
+                </a>
+            </nav>
+        </div>
     </header>
 
     <main class="container">
