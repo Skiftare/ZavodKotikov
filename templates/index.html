@@ -1,5 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
+    <div class="about_main-image-container">
+        <img src="{{ url_for('static', filename='img/about_main.png') }}" alt="О нас" class="about-image">
+
+        <!-- Текст 1 - Заголовок -->
+        <div class="text-block about_main-text-title">
+            <h1>Немного<br>о нас...</h1>
+        </div>
+
+        <!-- Текст 2 - Подзаголовок -->
+        <div class="text-block about_main-text-subtitle">
+            <p>Мы — первый в мире завод котов, достигший чистоты выходного материала более чем 99.97%. Наши коты уникальны, пушисты и абсолютно цифровые, а также не оставляют наших клиентов равнодушными.
+    </p>
+        </div>
+
+        <!-- Текст 3 - Описание -->
+        <div class="text-block about_main-text-description">
+            <p>Каждый кот имеет свой неповторимый ID и хранится в блокчейне.</p>
+        </div>
+</div>
     <h2>Добро пожаловать!</h2>
     <p>Наш завод котов варит самых пушистых NFT-котиков на рынке с поразительно высокой чистотой конечного материала</p>
 {% endblock %}
