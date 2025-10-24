@@ -30,7 +30,7 @@ def generate_csrf_token():
 app.jinja_env.globals["csrf_token"] = generate_csrf_token
 
 
-def compute_price(breed: str, color: str, ears: str, paws: str, container: str) -> str:
+def compute_price(breed: str, color: str, ears: str, paws: str, pattern: str, container: str) -> str:
     temp_item = OrderItem(
         cat_id=str(uuid.uuid4()),
         name="",
@@ -39,7 +39,8 @@ def compute_price(breed: str, color: str, ears: str, paws: str, container: str) 
         ears=ears,
         paws=paws,
         price=0,
-        container=container
+        container=container,
+        pattern=pattern
     )
     price = order_service.calculate_price(temp_item)
     return f"{price} XML"
@@ -59,12 +60,13 @@ def about():
 def _slug(s: str) -> str:
     return s.strip().lower().replace(" ", "-")
 
-def _cat_layer_paths(breed: str, color: str, ears: str, paws: str, container: str) -> list[str]:
+def _cat_layer_paths(breed: str, color: str, ears: str, paws: str, container: str, pattern: str) -> list[str]:
     """
     Слои в порядке наложения:
       1) <порода>-<цвет>.png
-      2) <уши>.png
-      3) <лапы>.png (если лапы != 'в цвет')
+      2) <рисунок>.png (если рисунок не "Обычная")
+      3) <уши>.png
+      4) <лапы>.png (если лапы != 'в цвет')
     Если отсутствует хотя бы один из нужных слоёв — добавляем SPECIAL_IMG поверх.
     Если не найден ни один слой и есть SPECIAL_IMG — возвращаем только SPECIAL_IMG.
     Если нет вообще ничего — 404.
@@ -85,6 +87,11 @@ def _cat_layer_paths(breed: str, color: str, ears: str, paws: str, container: st
     if _slug(container) != "без-контейнера":
         container_fn = f"{_slug(container)}.png"
         filenames.append(container_fn)
+
+    # рисунок добавляем только если не "Обычная"
+    if pattern != "Обычная":
+        pattern_fn = f"{_slug(pattern)}.png"
+        filenames.insert(2, pattern_fn)  # добавляем после breed и перед color
 
     paths: list[str] = []
     missing = False
@@ -122,8 +129,9 @@ def compose_cat():
     ears  = request.args.get("ears", "Острые в разные стороны")
     paws  = request.args.get("paws", "В цвет")
     container = request.args.get("container", "Без контейнера")
+    pattern = request.args.get("pattern", "Обычная")
 
-    files = _cat_layer_paths(breed, color, ears, paws, container)
+    files = _cat_layer_paths(breed, color, ears, paws, container, pattern)
     return compose_file(files)
 
 
@@ -138,10 +146,11 @@ def shop():
         "color": "Серый",
         "ears": "Острые в разные стороны",
         "paws": "В цвет",
-        "container": "Без контейнера",  # <— добавили
+        "container": "Без контейнера",
+        "pattern": "Обычная"
     }
     price = compute_price(form_data["breed"], form_data["color"], form_data["ears"], form_data["paws"],
-                          form_data["container"])
+                          form_data["container"], form_data["pattern"])
 
     if request.method == "POST":
         token = request.form.get("csrf_token")
@@ -154,13 +163,14 @@ def shop():
         color = request.form.get("color", form_data["color"])
         ears = request.form.get("ears", form_data["ears"])
         paws = request.form.get("paws", form_data["paws"])
+        pattern = request.form.get("pattern", form_data["pattern"])
         container = request.form.get("container", form_data["container"])
         action = request.form.get("action", "preview")
 
         form_data.update({"name": name, "breed": breed, "color": color, "ears": ears, "paws": paws,
-                          "container": container})
+                          "container": container, "pattern": pattern})
 
-        price = compute_price(breed, color, ears, paws, container)
+        price = compute_price(breed, color, ears, paws, pattern, container)
 
         cat_img_url = url_for(
             "compose_cat",
@@ -168,7 +178,8 @@ def shop():
             color=color,
             ears=ears,
             paws=paws,
-            container=container
+            container=container,
+            pattern=pattern
         )
 
         if action == "add":
@@ -179,6 +190,7 @@ def shop():
                 "ears": ears,
                 "paws": paws,
                 "container": container,
+                "pattern": pattern,
                 "price": price,
                 "image": cat_img_url,
             }
@@ -232,6 +244,7 @@ def checkout():
                     ears=cat["ears"],
                     paws=cat["paws"],
                     container=cat["container"],
+                    pattern=cat["pattern"],
                     price=price
                 )
             )
