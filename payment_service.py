@@ -18,6 +18,7 @@ class OrderItem:
     color: str
     ears: str
     paws: str
+    container: str
     price: int
 
 @dataclass

@@ -45,15 +45,21 @@
     <select name="ears" required>
       {% set e = form_data.ears %}
       <option value="Острые в разные стороны" {{ 'selected' if e=='Острые в разные стороны' else '' }}>Острые в разные стороны</option>
-      <option value="Стоячие"                  {{ 'selected' if e=='Стоячие'                  else '' }}>Стоячие</option>
+      <option value="Круглые"                  {{ 'selected' if e=='Круглые'                  else '' }}>Круглые</option>
       <option value="Скругленные"              {{ 'selected' if e=='Скругленные'              else '' }}>Скругленные</option>
     </select>
-
     <label>Лапки</label>
     <select name="paws" required>
       {% set p = form_data.paws %}
       <option value="В цвет"        {{ 'selected' if p=='В цвет'        else '' }}>В цвет</option>
       <option value="Белые лапки"   {{ 'selected' if p=='Белые лапки'   else '' }}>Белые лапки</option>
+    </select>
+
+    <label>Контейнер</label>
+    <select name="container" required>
+      {% set ct = form_data.container %}
+      <option value="Без контейнера" {{ 'selected' if ct=='Без контейнера' else '' }}>Без контейнера</option>
+      <option value="В контейнере"   {{ 'selected' if ct=='В контейнере'   else '' }}>В контейнере</option>
     </select>
 
     <!-- НЕИЗМЕНЯЕМАЯ ЦЕНА -->
@@ -74,7 +80,7 @@
 </div>
 
 <script>
-  // Автосабмит при изменениях (предпросмотр + пересчёт цены)
+  // Автосабмит только при изменении селектов (предпросмотр + пересчёт цены)
   (function () {
     const form = document.getElementById('cat-form');
     const actionField = document.getElementById('action-field');
@@ -86,11 +92,15 @@
       t = setTimeout(() => form.submit(), 300);
     }
 
-    form.querySelectorAll('select, input[name="name"]').forEach(el => {
+    // ВАЖНО: слушаем только select'ы
+    form.querySelectorAll('select').forEach(el => {
       el.addEventListener('change', scheduleSubmit);
-      if (el.tagName.toLowerCase() === 'input') {
-        el.addEventListener('input', scheduleSubmit);
-      }
+    });
+
+    // На всякий случай — Enter в поле имени не сабмитит форму
+    const nameInput = form.querySelector('input[name="name"]');
+    nameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') e.preventDefault();
     });
   })();
 </script>
