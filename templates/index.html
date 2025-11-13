@@ -10,30 +10,114 @@
 
         <!-- Текст 2 - Подзаголовок -->
         <div class="text-block about_main-text-subtitle">
-            <p>Мы — первый в мире завод котов, достигший чистоты выходного материала более чем 99.97%. Наши коты уникальны, пушисты и абсолютно цифровые, а также не оставляют наших клиентов равнодушными.
-    </p>
+            <p>Мы — первый в мире завод котов, достигший чистоты выходного материала более чем 99.97%. Наши коты уникальны, пушисты и абсолютно цифровые, а также не оставляют наших клиентов равнодушными.</p>
         </div>
 
         <!-- Текст 3 - Описание -->
         <div class="text-block about_main-text-description">
             <p>Каждый кот имеет свой неповторимый ID и хранится в блокчейне.</p>
         </div>
-</div>
-<div class="about_info-image-container">
-    <img src="{{ url_for('static', filename='img/about_info.png') }}" alt="Информация о нас" class="about-info-image">
-
-    <div class="text-block about_info-text-1">
-        <p>Стоим надёжно и устойчиво на своих лапах уже почти 2 месяца</p>
     </div>
 
-    <div class="text-block about_info-text-2">
-        <p>Не вставая с подушки соберите своего собственного котика</p>
+    <div class="about_info-image-container">
+        <img src="{{ url_for('static', filename='img/about_info.png') }}" alt="Информация о нас" class="about-info-image">
+
+        <div class="text-block about_info-text-1">
+            <p>Стоим надёжно и устойчиво на своих лапах уже почти 2 месяца</p>
+        </div>
+
+        <div class="text-block about_info-text-2">
+            <p>Не вставая с подушки соберите своего собственного котика</p>
+        </div>
+
+        <div class="text-block about_info-text-3">
+            <p>Доставим котика быстро, и тыгыдыкнуть не успеете</p>
+        </div>
     </div>
 
-    <div class="text-block about_info-text-3">
-        <p>Доставим котика быстро, и тыгыдыкнуть не успеете</p>
-    </div>
-</div>
+    <div class="reviews-section">
+        <div class="reviews-container">
+            <!-- Кнопки переключения -->
+            <button class="review-nav review-prev"
+                    style="background: url('{{ url_for('static', filename='img/arrow-left.png') }}') center/contain no-repeat;">
+            </button>
+
+            <button class="review-nav review-next"
+                    style="background: url('{{ url_for('static', filename='img/arrow-right.png') }}') center/contain no-repeat;">
+            </button>
+
+            <!-- Контейнер для отзывов -->
+            <div class="reviews-carousel">
+                 <!-- Отзыв 1 -->
+                <div class="review-item active">
+                    <div class="review-header">
+                        <div class="reviewer-avatar">👤</div>
+                        <div class="reviewer-info">
+                            <h4>Анна К.</h4>
+                            <div class="review-rating">★★★★★</div>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        <div class="review-text-container">
+                            <p class="review-text">"Мой NFT-котик просто прекрасен! Качество превзошло все ожидания. Очень довольна покупкой!"</p>
+                        </div>
+                        <div class="review-cat-container">
+                            <div class="review-cat-image">😺</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Отзыв 2 -->
+                <div class="review-item">
+                    <div class="review-header">
+                        <div class="reviewer-avatar">👤</div>
+                        <div class="reviewer-info">
+                            <h4>Михаил П.</h4>
+                            <div class="review-rating">★★★★☆</div>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        <div class="review-text-container">
+                            <p class="review-text">"Быстрая доставка, отличное качество. Котик выглядит именно так, как на картинке!"</p>
+                        </div>
+                        <div class="review-cat-container">
+                            <div class="review-cat-image">😸</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Отзыв 3 -->
+                <div class="review-item">
+                    <div class="review-header">
+                        <div class="reviewer-avatar">👤</div>
+                        <div class="reviewer-info">
+                            <h4>Елена С.</h4>
+                            <div class="review-rating">★★★★★</div>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        <div class="review-text-container">
+                            <p class="review-text">"Невероятно милый котик! Техподдержка помогла с настройкой. Рекомендую всем!"</p>
+                        </div>
+                        <div class="review-cat-container">
+                            <div class="review-cat-image">🐱</div>
+                        </div>
+                    </div>
+                </div>
+
+            <!-- Индикаторы (точки) -->
+            <div class="review-indicators">
+                <span class="indicator active"></span>
+                <span class="indicator"></span>
+                <span class="indicator"></span>
+            </div>
+        </div>
+    </div></div>
+
     <h2>Добро пожаловать!</h2>
     <p>Наш завод котов варит самых пушистых NFT-котиков на рынке с поразительно высокой чистотой конечного материала</p>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/reviews.js') }}"></script>
 {% endblock %}
