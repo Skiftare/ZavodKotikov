@@ -10,19 +10,25 @@
   --outline: #79747e;
 }
 
+/* Применяем Comfortaa ко всему сайту */
+* {
+  font-family: 'Comfortaa', cursive;
+}
+
 body {
   margin: 0;
-  font-family: "Roboto", sans-serif;
+  font-family: 'Comfortaa', cursive;
   background: var(--background);
   color: var(--on-surface);
-  min-width: 1400px; /* Минимальная ширина сайта */
+  min-width: 1400px;
 }
 
 .container {
   padding: 2rem;
-  max-width: 1400px; /* Фиксированная максимальная ширина */
+  max-width: 1400px;
   margin: 0 auto;
 }
+
 /* Шапка */
 .app-bar {
   background: var(--primary);
@@ -31,15 +37,7 @@ body {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-}
-
-.nav-container {
-  display: flex;
-  justify-content: space-between; /* Лого слева, навигация справа */
-  align-items: center;
-  width: 100%; /* Занимает всю доступную ширину */
-  max-width: 1200px;
-  margin: 0 auto;
+  font-family: 'Comfortaa', cursive;
 }
 
 .nav-container {
@@ -57,20 +55,22 @@ body {
   align-items: center;
   margin: 0;
   padding: 0;
+  font-family: 'Comfortaa', cursive;
 }
 
 .app-bar nav a {
   color: var(--on-primary);
   text-decoration: none;
-  font-weight: 1000;
+  font-weight: 700; /* Жирный для навигации */
   white-space: nowrap;
+  font-family: 'Comfortaa', cursive;
 }
 
 .app-bar nav a:hover {
   text-decoration: underline;
 }
 
-/* Логотип - убираем любые отступы */
+/* Логотип */
 .logo {
   margin: 0;
   padding: 0;
@@ -91,6 +91,7 @@ body {
   border-radius: 12px;
   padding: 1rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  font-family: 'Comfortaa', cursive;
 }
 
 .btn {
@@ -100,6 +101,8 @@ body {
   padding: 0.5rem 1rem;
   border-radius: 8px;
   cursor: pointer;
+  font-family: 'Comfortaa', cursive;
+  font-weight: 500;
 }
 
 .btn:hover {
@@ -113,124 +116,11 @@ body {
   text-align: center;
   background: var(--surface);
   border-top: 1px solid var(--outline);
-}
-
-.hero-cat {
-  margin-top: 1rem;
-  max-width: 300px;
-  border-radius: 12px;
-}
-
-.shop-layout {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 1.5rem;
-  align-items: start;
-}
-@media (max-width: 900px) {
-  .shop-layout { grid-template-columns: 1fr; }
-}
-
-.preview-box {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  aspect-ratio: 1 / 1;         /* квадратное окно */
-  border: 1px dashed var(--outline);
-  border-radius: 12px;
-  overflow: hidden;
-  background: #faf7ff;
-}
-.preview-img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-.form-card label { display:block; margin-top: .5rem; font-weight: 500; }
-.form-card input[type="text"],
-.form-card select { width: 100%; padding: .5rem; margin-top: .25rem; border-radius: 8px; border: 1px solid var(--outline); }
-.actions { display: flex; gap: .5rem; margin-top: 1rem; }
-
-/* Нормализация расчёта ширины, чтобы инпуты не вылезали за карточку */
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-/* Единый стиль для полей формы на странице Магазин */
-.form-card {
-  display: grid;
-  gap: .75rem;
-}
-
-.form-card label {
+  font-family: 'Comfortaa', cursive;
   font-weight: 500;
 }
 
-.form-card input[type="text"],
-.form-card select {
-  width: 100%;
-  display: block;
-  font-size: 16px;
-  line-height: 1.2;
-  padding: .6rem .8rem;
-  border: 1px solid var(--outline);
-  border-radius: 12px;
-  background: var(--surface);
-  /* убираем системные артефакты, чтобы высоты совпадали */
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-/* аккуратный фокус, без «прыжка» из-за outline */
-.form-card input[type="text"]:focus,
-.form-card select:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(103,80,164,.15);
-  border-color: var(--primary);
-}
-
-/* красивый «треугольник» у select и запас справа */
-.form-card select {
-  padding-right: 2.2rem;
-  background-image:
-    linear-gradient(45deg, transparent 50%, var(--outline) 50%),
-    linear-gradient(135deg, var(--outline) 50%, transparent 50%),
-    linear-gradient(to right, transparent, transparent);
-  background-position:
-    calc(100% - 1.1rem) calc(50% - 3px),
-    calc(100% - .9rem)  calc(50% - 3px),
-    100% 0;
-  background-size: 6px 6px, 6px 6px, 2.6rem 100%;
-  background-repeat: no-repeat;
-}
-
-.page-title {
-  text-transform: uppercase;   /* капсом */
-  text-align: center;          /* по центру */
-  margin: 0 0 1rem;            /* нижний отступ, чтобы дышало */
-  letter-spacing: .03em;       /* чуть-чуть разрядки (по желанию) */
-}
-
-.subtitle {
-  text-align: center;     /* по центру */
-  max-width: 60ch;        /* приятная ширина строки */
-  margin: 0 auto 1rem;    /* центрируем блок и даём отступ снизу */
-}
-
-/* Кнопка на всю ширину формы */
-.btn--block {
-  display: block;
-  width: 100%;
-  text-align: center;
-}
-
-/* Чуть крупнее текст и больше паддинги */
-.btn--lg {
-  font-size: 1.1rem;
-  padding: 0.8rem 1.2rem;
-  font-weight: 600;
-}
+/* Остальные стили... */
 
 .about_main-image-container {
     position: relative;
@@ -247,61 +137,60 @@ body {
 .text-block {
     position: absolute;
     word-wrap: break-word;
-    font-family: "Georgia", "Times New Roman", serif;
-    font-weight: bold;
+    font-family: 'Comfortaa', cursive;
 }
 
 .about_main-text-title {
-    top: 23%;
-    left: 15%;
+    top: 20%;
+    left: 20%;
     text-align: left;
-    max-width: 420px;
+    max-width: 550px;
     color: #9a4d16;
     z-index: 2;
+    font-weight: 700; /* Жирный */
 }
 
 .about_main-text-title h1 {
     font-size: 60px;
     margin: 0;
-    font-weight: 900;
     font-style: italic;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-    line-height: 1.1;
+    line-height: 1.4;
+    font-weight: 700; /* Жирный */
 }
 
 .about_main-text-subtitle {
-    top: 66%;
+    top: 65%;
     left: 50.5%;
     transform: translateX(-50%);
     text-align: center;
-    max-width: 630px;
+    max-width: 530px;
     color: var(--background);
     padding: 0.8rem 1.5rem;
     border-radius: 8px;
-    font-weight: 500;
 }
 
 .about_main-text-subtitle p {
-    font-size: 20px;
+    font-size: 19px;
     margin: 0;
-    font-weight: 500;
+    font-weight: 500; /* Полужирный */
 }
 
 .about_main-text-description {
     bottom: 20%;
-    right: 28%;
+    right: 29%;
     top: 86%;
     text-align: right;
     max-width: 360px;
     color: var(--background);
     padding: 0.8rem 1.2rem;
-    font-weight: 500;
+    font-weight: 400; /* Полужирный */
 }
 
 .about_main-text-description p {
     font-size: 16px;
     margin: 0;
-    font-weight: 500;
+    font-weight: 400; /* Полужирный */
 }
 
 /* Контейнер для about_info */
@@ -318,53 +207,53 @@ body {
 
 /* Текст 1 */
 .about_info-text-1 {
-    top: 23%;
-    left: 10%;
+    top: 20%;
+    left: 12%;
     text-align: center;
     max-width: 250px;
     color: var(--on-surface);
-    font-weight: 500;
+    font-weight: 600; /* Полужирный */
 }
 
 .about_info-text-1 p {
     font-size: clamp(1.3rem, 2.1vw, 1.6rem);
     margin: 0;
-    font-weight: 500;
+    font-weight: 600; /* Полужирный */
 }
 
 /* Текст 2 */
 .about_info-text-2 {
-    top: 69%;
-    left: 36%;
+    top: 67%;
+    left: 37%;
     text-align: center;
     max-width: 250px;
     color: var(--on-surface);
-    font-weight: 500;
+    font-weight: 600; /* Полужирный */
 }
 
 .about_info-text-2 p {
     font-size: clamp(1.3rem, 2.1vw, 1.6rem);
     margin: 0;
-    font-weight: 500;
+    font-weight: 600; /* Полужирный */
 }
 
 /* Текст 3 */
 .about_info-text-3 {
     top: 33%;
-    right: 8%;
+    right: 10%;
     text-align: center;
     max-width: 250px;
     color: var(--on-surface);
-    font-weight: 500;
+    font-weight: 600; /* Полужирный */
 }
 
 .about_info-text-3 p {
     font-size: clamp(1.3rem, 2.1vw, 1.6rem);
     margin: 0;
-    font-weight: 500;
+    font-weight: 600; /* Полужирный */
 }
 
-/*----------------------------------------*/
+/* Отзывы */
 .reviews-section {
     padding: 4rem 0;
     background-image: url('../img/about_reviews.png'); /* Конкретная картинка */
@@ -372,7 +261,7 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     position: relative;
-    min-height: 600px;
+    weight: 1400px;
     display: flex;
     align-items: center;
 }
@@ -411,7 +300,7 @@ body {
 /* Секция отзывов */
 .reviews-container {
     position: relative;
-    max-width: 700px;
+    max-width: 650px;
     margin: 0 auto;
     border-radius: 20px;
     padding: 2rem;
@@ -572,40 +461,54 @@ body {
 .indicator:hover {
     background: var(--secondary);
 }
-/*------------------==========================------------=*/
-.custom-rectangle {
-    width: 1400px;
-    height: 600px;
-    background: var(--surface); /* Цвет фона */
-    border: 2px solid var(--outline); /* Рамка */
-    border-radius: 12px; /* Закругленные углы */
-    margin: 2rem auto; /* Отступы и центрирование */
-    padding: 1.5rem; /* Внутренние отступы */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Тень */
-    color: var(--on-surface); /* Цвет текста */
-}
-.custom-rectangle2 {
-    width: 1000px;
-    height: 500px;
-    background: var(--surface); /* Цвет фона */
-    border: 2px solid var(--outline); /* Рамка */
-    border-radius: 12px; /* Закругленные углы */
-    margin: 2rem auto; /* Отступы и центрирование */
-    padding: 1.5rem; /* Внутренние отступы */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Тень */
-    color: var(--on-surface); /* Цвет текста */
-}
-/*--------------===============================--------------------*/
 
-/* Контейнер с кнопкой без flex, чтобы ширина 100% работала однозначно */
+/* Catinbox */
+.catinbox {
+    width: 700px;
+    height: 570px;
+    background: transparent;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    position: relative;
+}
+
+.catinbox-text {
+    font-size: 60px;
+    font-weight: 700; /* Жирный */
+    color: #9a4d16;
+    text-align: left;
+    background: transparent;
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    width: 600px;
+}
+
+.catinbox-link {
+    position: absolute;
+    bottom: 50px;
+    right: 50px;
+    text-decoration: none;
+}
+
+.catinbox-image {
+    width: 600px;
+    height: 400px;
+    background: url('../img/catInBox.png') center/contain no-repeat;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.catinbox-image:hover {
+    transform: translateY(-5px);
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+}
+
+/* Остальные элементы... */
 .actions {
   display: block;
   margin-top: 1rem;
@@ -626,12 +529,11 @@ body {
   border: 1px solid rgba(255,255,255,.6);
 }
 
-/* Блок с ценой: визуально отличается от инпутов */
 .price-box {
   margin-top: .5rem;
   padding: .8rem 1rem;
   border-radius: 12px;
-  background: #f2eafc;                 /* мягкий фон */
+  background: #f2eafc;
   border: 1px solid rgba(103,80,164,.25);
 }
 
@@ -639,34 +541,47 @@ body {
   font-size: .9rem;
   opacity: .75;
   margin-bottom: .25rem;
+  font-weight: 500; /* Средняя жирность */
 }
 
 .price-value {
-  font-size: 1.4rem;                    /* крупнее */
-  font-weight: 700;
+  font-size: 1.4rem;
+  font-weight: 700; /* Жирный */
   line-height: 1.2;
-}
-
-/* Шрифт только для шапки */
-.app-bar,
-.app-bar nav a {
-  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  font-weight: 600;      /* толщина */
-  letter-spacing: .01em; /* необязательно */
 }
 
 .header-banner {
     width: 100%;
     background: #fef7ff;
     text-align: center;
-    overflow: hidden; /* Обрезает выходящие за границы части */
+    overflow: hidden;
 }
 
 .header-banner img {
     width: 100%;
     height: auto;
-    min-height: 100px; /* Минимальная высота */
-    max-height: 400px; /* Максимальная высота */
-    object-fit: cover; /* Заполняет область без искажений */
+    min-height: 100px;
+    max-height: 400px;
+    object-fit: cover;
     display: block;
 }
+
+/* Дополнительные текстовые элементы */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Comfortaa', cursive;
+    font-weight: 700; /* Жирный для всех заголовков */
+}
+
+p {
+    font-family: 'Comfortaa', cursive;
+    font-weight: 400; /* Обычный для параграфов */
+}
+
+/* Чтобы сделать любой текст жирным, добавьте: */
+.bold-text {
+    font-weight: 700 !important;
+}
+
+/* Или используйте HTML: */
+/* <span class="bold-text">Ваш жирный текст</span> */
+/* <strong>Ваш жирный текст</strong> */
