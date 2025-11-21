@@ -105,17 +105,27 @@
                     </div>
                 </div>
 
-            <!-- Индикаторы (точки) -->
-            <div class="review-indicators">
-                <span class="indicator active"></span>
-                <span class="indicator"></span>
-                <span class="indicator"></span>
+                <!-- Индикаторы (точки) -->
+                <div class="review-indicators">
+                    <span class="indicator active"></span>
+                    <span class="indicator"></span>
+                    <span class="indicator"></span>
+                </div>
             </div>
         </div>
-    </div></div>
+    </div>
 
-    <h2>Добро пожаловать!</h2>
-    <p>Наш завод котов варит самых пушистых NFT-котиков на рынке с поразительно высокой чистотой конечного материала</p>
+    <div class="catinbox">
+        <!-- Текст в большом прямоугольнике -->
+        <div class="catinbox-text">
+            Создайте своего котика...
+        </div>
+
+        <!-- Картинка вместо маленького прямоугольника -->
+        <a href="{{ url_for('shop') }}" class="catinbox-link">
+            <div class="catinbox-image"></div>
+        </a>
+    </div>
 {% endblock %}
 
 {% block scripts %}
