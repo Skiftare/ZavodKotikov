@@ -473,19 +473,23 @@ body {
 }
 
 .catinbox-text {
-    font-size: 60px;
-    font-weight: 700; /* Жирный */
-    color: #9a4d16;
-    text-align: left;
-    background: transparent;
     position: absolute;
     top: 30px;
     left: 30px;
-    margin: 0;
+    margin: -200px 0 0 -200px;
     padding: 0;
     border: none;
     box-shadow: none;
+    background: transparent;
     width: 600px;
+    height: auto;
+    text-align: left;
+}
+
+.catinbox-text-img {
+    display: block;
+    max-width: 100%;
+    height: auto;
 }
 
 .catinbox-link {
