@@ -6,10 +6,15 @@ from datetime import timedelta
 from werkzeug.exceptions import NotFound
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
+from extensions import mail
 
 from order_service import OrderService
 from payment_gateway import MockPaymentGateway
 from payment_service import OrderItem, PaymentStatus
+from email_utils import send_nft_cats_email
+
+from dotenv import load_dotenv
+load_dotenv()
 
 # Инициализация сервисов
 payment_gateway = MockPaymentGateway()
@@ -20,6 +25,19 @@ app.secret_key = secrets.token_hex(16)
 app.permanent_session_lifetime = timedelta(days=7)
 LAYERS_DIR = os.path.join(app.root_path, "static", "cats", "layers")
 SPECIAL_IMG = os.path.join(app.root_path, "static", "cats", "special.png")
+
+app.config.update(
+    MAIL_SERVER='smtp.yandex.ru',
+    MAIL_PORT=587,
+    MAIL_USE_TLS=True,
+    MAIL_USE_SSL=False,
+    MAIL_USERNAME=os.getenv('MAIL_USERNAME'),
+    MAIL_PASSWORD=os.getenv('MAIL_PASSWORD'),
+    MAIL_DEFAULT_SENDER=('ЗАВОД КОТИКОВ', os.getenv('MAIL_USERNAME')),
+)
+
+# инициализируем mail расширение
+mail.init_app(app)
 
 def generate_csrf_token():
     if "_csrf_token" not in session:
@@ -306,7 +324,21 @@ def confirm_payment(order_id):
             order = order_service.get_order(order_id, session["session_id"])
             if order:
                 order.email = email
+
+                # Пытаемся отправить письмо с котами
+                try:
+                    send_nft_cats_email(order)
+                except Exception as e:
+                    app.logger.error(f"Ошибка отправки письма: {e}")
+                    flash(
+                        "Оплата прошла, но письмо с котами отправить не удалось. "
+                        "Если в течение нескольких минут письмо не придёт — напишите нам.",
+                        "warning"
+                    )
+
+                # очищаем корзину в сессии
                 session.pop("orders", None)
+
             return redirect(url_for("payment_success", order_id=order_id))
         elif status == PaymentStatus.FAILED or status is None:
             return redirect(url_for("payment_failed", order_id=order_id))
