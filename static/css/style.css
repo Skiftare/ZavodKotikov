@@ -125,7 +125,7 @@ body {
 .about_main-image-container {
     position: relative;
     text-align: center;
-    margin: 0 auto 2rem auto;
+    margin: 100px 0 100px 0;
 }
 
 .about-image {
@@ -467,7 +467,7 @@ body {
     width: 700px;
     height: 570px;
     background: transparent;
-    margin: 2rem auto;
+    margin: 8rem auto;
     padding: 1.5rem;
     position: relative;
 }
@@ -476,7 +476,7 @@ body {
     position: absolute;
     top: 30px;
     left: 30px;
-    margin: -200px 0 0 -200px;
+    margin: -120px 0 0 -200px;
     padding: 0;
     border: none;
     box-shadow: none;

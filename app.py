@@ -5,7 +5,7 @@ from image_generator import compose_file
 from datetime import timedelta
 from werkzeug.exceptions import NotFound
 
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from extensions import mail
 
 from order_service import OrderService
@@ -377,6 +377,29 @@ def payment_failed(order_id):
 
     return render_template("payment_failed.html", title="Ошибка оплаты", order=order)
 
+@app.route("/api/price")
+def api_price():
+    breed = request.args.get("breed", "Британец")
+    color = request.args.get("color", "Серый")
+    ears = request.args.get("ears", "Острые в разные стороны")
+    paws = request.args.get("paws", "В цвет")
+    container = request.args.get("container", "Без контейнера")
+    pattern = request.args.get("pattern", "Обычная")
+
+    temp_item = OrderItem(
+        cat_id=str(uuid.uuid4()),
+        name="",
+        breed=breed,
+        color=color,
+        ears=ears,
+        paws=paws,
+        container=container,
+        pattern=pattern,
+        price=0,
+    )
+
+    price = order_service.calculate_price(temp_item)
+    return jsonify({"price": price, "formatted": f"{price} XML"})
 
 if __name__ == "__main__":
     app.run(debug=False, port=7080)
