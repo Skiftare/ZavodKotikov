@@ -1,133 +1,119 @@
 {% extends "base.html" %}
 {% block content %}
-    <div class="about_main-image-container">
-        <img src="{{ url_for('static', filename='img/about_main.png') }}" alt="О нас" class="about-image">
+<div class="about_main-image-container">
+    <img src="{{ url_for('static', filename='img/about_main.png') }}" alt="О нас" class="about-image">
+    {# Текстовые блоки "Немного о нас...", "Мы — первый в мире завод котов...",
+    "Каждый кот имеет свой неповторимый ID..." удалены #}
+</div>
 
-        <!-- Текст 1 - Заголовок -->
-        <div class="text-block about_main-text-title">
-            <h1>Немного<br>о нас...</h1>
-        </div>
+<div class="about_info-image-container">
+    <img src="{{ url_for('static', filename='img/about_info.png') }}" alt="Информация о нас" class="about-info-image">
+    {# Блоки с текстами:
+    "Стоим надёжно и устойчиво на своих лапах уже почти 2 месяца"
+    "Не вставая с подушки соберите своего собственного котика"
+    "Доставим котика быстро, и тыгыдыкнуть не успеете"
+    удалены #}
+</div>
 
-        <!-- Текст 2 - Подзаголовок -->
-        <div class="text-block about_main-text-subtitle">
-            <p>Мы — первый в мире завод котов, достигший чистоты выходного материала более чем 99.97%. Наши коты уникальны, пушисты и абсолютно цифровые, а также не оставляют наших клиентов равнодушными.</p>
-        </div>
+<div class="reviews-section">
+    <div class="reviews-container">
+        <!-- Кнопки переключения -->
+        <button class="review-nav review-prev"
+                style="background: url('{{ url_for('static', filename='img/arrow-left.png') }}') center/contain no-repeat;">
+        </button>
 
-        <!-- Текст 3 - Описание -->
-        <div class="text-block about_main-text-description">
-            <p>Каждый кот имеет свой неповторимый ID и хранится в блокчейне.</p>
-        </div>
-    </div>
+        <button class="review-nav review-next"
+                style="background: url('{{ url_for('static', filename='img/arrow-right.png') }}') center/contain no-repeat;">
+        </button>
 
-    <div class="about_info-image-container">
-        <img src="{{ url_for('static', filename='img/about_info.png') }}" alt="Информация о нас" class="about-info-image">
-
-        <div class="text-block about_info-text-1">
-            <p>Стоим надёжно и устойчиво на своих лапах уже почти 2 месяца</p>
-        </div>
-
-        <div class="text-block about_info-text-2">
-            <p>Не вставая с подушки соберите своего собственного котика</p>
-        </div>
-
-        <div class="text-block about_info-text-3">
-            <p>Доставим котика быстро, и тыгыдыкнуть не успеете</p>
-        </div>
-    </div>
-
-    <div class="reviews-section">
-        <div class="reviews-container">
-            <!-- Кнопки переключения -->
-            <button class="review-nav review-prev"
-                    style="background: url('{{ url_for('static', filename='img/arrow-left.png') }}') center/contain no-repeat;">
-            </button>
-
-            <button class="review-nav review-next"
-                    style="background: url('{{ url_for('static', filename='img/arrow-right.png') }}') center/contain no-repeat;">
-            </button>
-
-            <!-- Контейнер для отзывов -->
-            <div class="reviews-carousel">
-                 <!-- Отзыв 1 -->
-                <div class="review-item active">
-                    <div class="review-header">
-                        <div class="reviewer-avatar">👤</div>
-                        <div class="reviewer-info">
-                            <h4>Анна К.</h4>
-                            <div class="review-rating">★★★★★</div>
-                        </div>
-                    </div>
-                    <div class="review-content">
-                        <div class="review-text-container">
-                            <p class="review-text">"Мой NFT-котик просто прекрасен! Качество превзошло все ожидания. Очень довольна покупкой!"</p>
-                        </div>
-                        <div class="review-cat-container">
-                            <div class="review-cat-image">😺</div>
-                        </div>
+        <!-- Контейнер для отзывов -->
+        <div class="reviews-carousel">
+            <!-- Отзыв 1 -->
+            <div class="review-item active">
+                <div class="review-header">
+                    <div class="reviewer-avatar">👤</div>
+                    <div class="reviewer-info">
+                        <h4>Анна К.</h4>
+                        <div class="review-rating">★★★★★</div>
                     </div>
                 </div>
-
-                <!-- Отзыв 2 -->
-                <div class="review-item">
-                    <div class="review-header">
-                        <div class="reviewer-avatar">👤</div>
-                        <div class="reviewer-info">
-                            <h4>Михаил П.</h4>
-                            <div class="review-rating">★★★★☆</div>
-                        </div>
+                <div class="review-content">
+                    <div class="review-text-container">
+                        <p class="review-text">"Мой NFT-котик просто прекрасен! Качество превзошло все ожидания. Очень
+                            довольна покупкой!"</p>
                     </div>
-                    <div class="review-content">
-                        <div class="review-text-container">
-                            <p class="review-text">"Быстрая доставка, отличное качество. Котик выглядит именно так, как на картинке!"</p>
-                        </div>
-                        <div class="review-cat-container">
-                            <div class="review-cat-image">😸</div>
-                        </div>
+                    <div class="review-cat-container">
+                        <div class="review-cat-image">😺</div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Отзыв 3 -->
-                <div class="review-item">
-                    <div class="review-header">
-                        <div class="reviewer-avatar">👤</div>
-                        <div class="reviewer-info">
-                            <h4>Елена С.</h4>
-                            <div class="review-rating">★★★★★</div>
-                        </div>
-                    </div>
-                    <div class="review-content">
-                        <div class="review-text-container">
-                            <p class="review-text">"Невероятно милый котик! Техподдержка помогла с настройкой. Рекомендую всем!"</p>
-                        </div>
-                        <div class="review-cat-container">
-                            <div class="review-cat-image">🐱</div>
-                        </div>
+            <!-- Отзыв 2 -->
+            <div class="review-item">
+                <div class="review-header">
+                    <div class="reviewer-avatar">👤</div>
+                    <div class="reviewer-info">
+                        <h4>Михаил П.</h4>
+                        <div class="review-rating">★★★★☆</div>
                     </div>
                 </div>
-
-                <!-- Индикаторы (точки) -->
-                <div class="review-indicators">
-                    <span class="indicator active"></span>
-                    <span class="indicator"></span>
-                    <span class="indicator"></span>
+                <div class="review-content">
+                    <div class="review-text-container">
+                        <p class="review-text">"Быстрая доставка, отличное качество. Котик выглядит именно так, как на
+                            картинке!"</p>
+                    </div>
+                    <div class="review-cat-container">
+                        <div class="review-cat-image">😸</div>
+                    </div>
                 </div>
+            </div>
+
+            <!-- Отзыв 3 -->
+            <div class="review-item">
+                <div class="review-header">
+                    <div class="reviewer-avatar">👤</div>
+                    <div class="reviewer-info">
+                        <h4>Елена С.</h4>
+                        <div class="review-rating">★★★★★</div>
+                    </div>
+                </div>
+                <div class="review-content">
+                    <div class="review-text-container">
+                        <p class="review-text">"Невероятно милый котик! Техподдержка помогла с настройкой. Рекомендую
+                            всем!"</p>
+                    </div>
+                    <div class="review-cat-container">
+                        <div class="review-cat-image">🐱</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Индикаторы (точки) -->
+            <div class="review-indicators">
+                <span class="indicator active"></span>
+                <span class="indicator"></span>
+                <span class="indicator"></span>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="catinbox">
-        <!-- Текст в большом прямоугольнике -->
-        <div class="catinbox-text">
-            Создайте своего котика...
-        </div>
-
-        <!-- Картинка вместо маленького прямоугольника -->
-        <a href="{{ url_for('shop') }}" class="catinbox-link">
-            <div class="catinbox-image"></div>
-        </a>
+<div class="catinbox">
+    <!-- Картинка вместо текста -->
+    <div class="catinbox-text">
+        <img src="{{ url_for('static', filename='img/catinbox_text.png') }}"
+             alt="Создайте своего котика"
+             class="catinbox-text-img">
     </div>
+
+    <!-- Картинка-кнопка -->
+    <a href="{{ url_for('shop') }}" class="catinbox-link">
+        <div class="catinbox-image"></div>
+    </a>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ url_for('static', filename='js/reviews.js') }}"></script>
+<script src="{{ url_for('static', filename='js/reviews.js') }}"></script>
 {% endblock %}

@@ -102,6 +102,7 @@
             <div class="price-value">{{ price }}</div>
         </div>
 
+
         <div class="actions">
             <button type="submit"
                     class="btn btn--block btn--lg"
@@ -114,29 +115,51 @@
 </div>
 
 <script>
-  // Автосабмит только при изменении селектов (предпросмотр + пересчёт цены)
   (function () {
     const form = document.getElementById('cat-form');
-    const actionField = document.getElementById('action-field');
-    let t;
+    const previewImg = document.querySelector('.preview-img');
+    const priceEl = document.querySelector('.price-value');
 
-    function scheduleSubmit() {
-      clearTimeout(t);
-      actionField.value = 'preview';
-      t = setTimeout(() => form.submit(), 300);
+    function updatePreviewAndPrice() {
+      const params = new URLSearchParams({
+        breed: form.elements['breed'].value,
+        color: form.elements['color'].value,
+        ears: form.elements['ears'].value,
+        paws: form.elements['paws'].value,
+        container: form.elements['container'].value,
+        pattern: form.elements['pattern'].value,
+      });
+
+      // 1) обновляем картинку
+      const imgBaseUrl = "{{ url_for('compose_cat') }}";
+      previewImg.src = imgBaseUrl + "?" + params.toString();
+
+      // 2) запрашиваем цену
+      const priceUrl = "{{ url_for('api_price') }}";
+      fetch(priceUrl + "?" + params.toString())
+        .then(resp => resp.json())
+        .then(data => {
+          priceEl.textContent = data.formatted;
+        })
+        .catch(err => {
+          console.error("Ошибка при получении цены:", err);
+        });
     }
 
-    // ВАЖНО: слушаем только select'ы
+    // слушаем только select'ы
     form.querySelectorAll('select').forEach(el => {
-      el.addEventListener('change', scheduleSubmit);
+      el.addEventListener('change', updatePreviewAndPrice);
     });
 
-    // На всякий случай — Enter в поле имени не сабмитит форму
+    // первый рендер при загрузке
+    updatePreviewAndPrice();
+
+    // запрет Enter в имени кота
     const nameInput = form.querySelector('input[name="name"]');
     nameInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') e.preventDefault();
     });
   })();
-
 </script>
+
 {% endblock %}
