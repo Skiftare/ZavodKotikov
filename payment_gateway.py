@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from stellar_sdk import Server, Network
 from stellar_sdk.exceptions import NotFoundError, BadRequestError
 
-from src.services.stellar.payment_service import PaymentStatus, Order
+from payment_service import PaymentStatus, Order
 
 # Загружаем переменные окружения
 load_dotenv()

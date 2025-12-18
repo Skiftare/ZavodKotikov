@@ -3,8 +3,8 @@ import uuid
 from datetime import datetime
 from typing import List, Optional
 
-from src.services.stellar.payment_gateway import PaymentGateway
-from src.services.stellar.payment_service import Order, OrderItem, PaymentStatus, MemoGenerator
+from payment_gateway import PaymentGateway
+from payment_service import Order, OrderItem, PaymentStatus, MemoGenerator
 
 
 class OrderService:

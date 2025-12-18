@@ -6,10 +6,10 @@ from werkzeug.exceptions import NotFound
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 
-from src.utils.image_generator import compose_file
-from src.services.order_service import OrderService
-from src.services.stellar.payment_gateway import MockPaymentGateway, StellarPaymentGateway
-from src.services.stellar.payment_service import OrderItem, PaymentStatus
+from image_generator import compose_file
+from order_service import OrderService
+from payment_gateway import MockPaymentGateway, StellarPaymentGateway
+from payment_service import OrderItem, PaymentStatus
 
 def test_payment_system():
     """

@@ -19,16 +19,9 @@ pip install -r requirements.txt
 ### Правильный способ запуска:
 
 ```bash
-python run.py
+python app.py
 ```
 
-или как модуль:
-
-```bash
-python -m src.app
-```
-
-**НЕ запускайте напрямую** `python src/app.py` - это вызовет ошибки импорта!
 
 ## ⚙️ Настройка
 

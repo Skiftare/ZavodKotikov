@@ -31,7 +31,7 @@ print("🚀 Инициализация Stellar Gateway...")
 print("=" * 70 + "\n")
 
 try:
-    from src.services.stellar.payment_gateway import StellarPaymentGateway
+    from payment_gateway import StellarPaymentGateway
 
     gateway = StellarPaymentGateway()
 
