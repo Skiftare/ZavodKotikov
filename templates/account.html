@@ -1,25 +1,325 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Корзина</h2>
+<div class="cart-container">
+    <h2>Корзина</h2>
 
-{% if orders and orders|length %}
-<ul>
+    {% if orders and orders|length %}
+    <form method="POST" id="cartForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="cart-actions">
+            <button type="button" onclick="selectAll()" class="btn-secondary">Выбрать всё</button>
+            <button type="button" onclick="deselectAll()" class="btn-secondary">Снять выбор</button>
+            <button type="submit" name="action" value="checkout" class="btn-primary" onclick="return validateCheckout()">
+                Оплатить выбранное
+            </button>
+            <button type="submit" name="action" value="delete" class="btn-danger" onclick="return confirmDelete()">
+                Удалить выбранное
+            </button>
+        </div>
+
+        <div class="cart-items">
+            {% for cat in orders %}
+            <div class="cart-item">
+                <input type="checkbox" name="selected_cats" value="{{ loop.index0 }}" class="cat-checkbox" id="cat-{{ loop.index0 }}">
+                <label for="cat-{{ loop.index0 }}" class="cat-item-content">
+                    <div class="cat-image">
+                        <img src="{{ cat.image }}" alt="{{ cat.name }}">
+                    </div>
+                    <div class="cat-details">
+                        <h3>{{ cat.name }}</h3>
+                        <div class="cat-specs">
+                            <span><strong>Порода:</strong> {{ cat.breed }}</span>
+                            <span><strong>Цвет:</strong> {{ cat.color }}</span>
+                            <span><strong>Ушки:</strong> {{ cat.ears }}</span>
+                            <span><strong>Лапки:</strong> {{ cat.paws }}</span>
+                            {% if cat.container != "Без контейнера" %}
+                            <span><strong>Контейнер:</strong> {{ cat.container }}</span>
+                            {% endif %}
+                            {% if cat.pattern != "Обычная" %}
+                            <span><strong>Рисунок:</strong> {{ cat.pattern }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="cat-price">{{ cat.price }}</div>
+                    </div>
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="cart-summary">
+            <div class="selected-info">
+                Выбрано: <span id="selectedCount">0</span> из {{ orders|length }}
+            </div>
+            <div class="total-price">
+                Итого: <span id="totalPrice">0</span> XML
+            </div>
+        </div>
+    </form>
+    {% else %}
+    <div class="empty-cart">
+        <p>Ваша корзина пуста.</p>
+        <a href="{{ url_for('shop') }}" class="btn-primary">Перейти в магазин</a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Цены котов для расчёта
+const catPrices = [
     {% for cat in orders %}
-    <li>
-        <img src="{{ cat.image }}" alt="{{ cat.name }}"
-             style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; vertical-align: middle;">
-
-        {{ cat.name }} — Порода: {{ cat.breed }}, Цвет: {{ cat.color }},
-        Ушки: {{ cat.ears }}, Лапки: {{ cat.paws }}
-    </li>
+    parseInt("{{ cat.price }}".split(" ")[0]){% if not loop.last %},{% endif %}
     {% endfor %}
-</ul>
+];
 
-<form method="POST" action="{{ url_for('checkout') }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <button type="submit">Оформить заказ</button>
-</form>
-{% else %}
-<p>Ваша корзина пуста.</p>
-{% endif %}
+function updateSummary() {
+    const checkboxes = document.querySelectorAll('.cat-checkbox:checked');
+    const count = checkboxes.length;
+    let total = 0;
+
+    checkboxes.forEach(checkbox => {
+        const index = parseInt(checkbox.value);
+        total += catPrices[index] || 0;
+    });
+
+    document.getElementById('selectedCount').textContent = count;
+    document.getElementById('totalPrice').textContent = total;
+}
+
+function selectAll() {
+    document.querySelectorAll('.cat-checkbox').forEach(cb => cb.checked = true);
+    updateSummary();
+}
+
+function deselectAll() {
+    document.querySelectorAll('.cat-checkbox').forEach(cb => cb.checked = false);
+    updateSummary();
+}
+
+function validateCheckout() {
+    const selected = document.querySelectorAll('.cat-checkbox:checked').length;
+    if (selected === 0) {
+        alert('Выберите хотя бы одного кота для оплаты');
+        return false;
+    }
+    return true;
+}
+
+function confirmDelete() {
+    const selected = document.querySelectorAll('.cat-checkbox:checked').length;
+    if (selected === 0) {
+        alert('Выберите котов для удаления');
+        return false;
+    }
+    return confirm(`Вы уверены, что хотите удалить ${selected} котов из корзины?`);
+}
+
+// Обновляем сумму при изменении чекбоксов
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.cat-checkbox').forEach(cb => {
+        cb.addEventListener('change', updateSummary);
+    });
+    updateSummary();
+});
+</script>
+
+<style>
+.cart-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.cart-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.btn-primary, .btn-secondary, .btn-danger {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.btn-primary {
+    background: #4CAF50;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #45a049;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.cart-items {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.cart-item {
+    display: flex;
+    align-items: flex-start;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    background: white;
+    transition: all 0.3s;
+}
+
+.cart-item:has(.cat-checkbox:checked) {
+    border-color: #4CAF50;
+    background: #f1f8f4;
+}
+
+.cat-checkbox {
+    margin-top: 5px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.cat-item-content {
+    display: flex;
+    flex: 1;
+    margin-left: 15px;
+    cursor: pointer;
+    align-items: flex-start;
+}
+
+.cat-image {
+    flex-shrink: 0;
+    margin-right: 20px;
+}
+
+.cat-image img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.cat-details {
+    flex: 1;
+}
+
+.cat-details h3 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 18px;
+}
+
+.cat-specs {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 14px;
+    color: #666;
+}
+
+.cat-specs span {
+    line-height: 1.5;
+}
+
+.cat-price {
+    font-size: 20px;
+    font-weight: bold;
+    color: #4CAF50;
+    margin-top: 10px;
+}
+
+.cart-summary {
+    margin-top: 20px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
+}
+
+.selected-info {
+    color: #666;
+}
+
+.total-price {
+    font-weight: bold;
+    font-size: 24px;
+    color: #333;
+}
+
+.total-price span {
+    color: #4CAF50;
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-cart p {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+/* Адаптив для мобильных */
+@media (max-width: 768px) {
+    .cart-actions {
+        flex-direction: column;
+    }
+
+    .cart-actions button {
+        width: 100%;
+    }
+
+    .cat-item-content {
+        flex-direction: column;
+    }
+
+    .cat-image {
+        margin-right: 0;
+        margin-bottom: 15px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .cat-image img {
+        width: 150px;
+        height: 150px;
+    }
+
+    .cart-summary {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+}
+</style>
 {% endblock %}
