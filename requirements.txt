@@ -1,0 +1,6 @@
+Flask
+Werkzeug
+Pillow
+stellar-sdk
+python-dotenv
+# Stellar Configuration
