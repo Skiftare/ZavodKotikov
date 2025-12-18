@@ -109,6 +109,16 @@ body {
   opacity: 0.9;
 }
 
+.btn--add {
+  background: #4CAF50;   /* любой цвет */
+  color: #fff;
+}
+
+.btn--add:hover {
+  opacity: 0.9;
+}
+
+
 /* Подвал */
 .footer {
   margin-top: 2rem;
