@@ -465,7 +465,7 @@ body {
 /* Catinbox */
 .catinbox {
     width: 700px;
-    height: 570px;
+    height: 600px;
     background: transparent;
     margin: 2rem auto;
     padding: 1.5rem;
@@ -508,6 +508,117 @@ body {
     filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
 }
 
+
+.form-card select {
+  width: 100%;
+  display: block;
+  font-size: 16px;
+  line-height: 1.2;
+  padding: .6rem .8rem;
+  border: 1px solid var(--outline);
+  border-radius: 12px;
+  background: var(--surface);
+  /* убираем системные артефакты, чтобы высоты совпадали */
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* аккуратный фокус, без «прыжка» из-за outline */
+.form-card input[type="text"]:focus,
+.form-card select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(103,80,164,.15);
+  border-color: var(--primary);
+}
+
+/* красивый «треугольник» у select и запас справа */
+.form-card select {
+  padding-right: 2.2rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--outline) 50%),
+    linear-gradient(135deg, var(--outline) 50%, transparent 50%),
+    linear-gradient(to right, transparent, transparent);
+  background-position:
+    calc(100% - 1.1rem) calc(50% - 3px),
+    calc(100% - .9rem)  calc(50% - 3px),
+    100% 0;
+  background-size: 6px 6px, 6px 6px, 2.6rem 100%;
+  background-repeat: no-repeat;
+}
+
+.page-title {
+  text-transform: uppercase;   /* капсом */
+  text-align: center;          /* по центру */
+  margin: 0 0 1rem;            /* нижний отступ, чтобы дышало */
+  letter-spacing: .03em;       /* чуть-чуть разрядки (по желанию) */
+}
+
+.subtitle {
+  text-align: center;     /* по центру */
+  max-width: 60ch;        /* приятная ширина строки */
+  margin: 0 auto 1rem;    /* центрируем блок и даём отступ снизу */
+}
+
+/* Кнопка на всю ширину формы */
+.btn--block {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+/* Чуть крупнее текст и больше паддинги */
+.btn--lg {
+  font-size: 1.1rem;
+  padding: 0.8rem 1.2rem;
+  font-weight: 600;
+}
+.hero-cat {
+  margin-top: 1rem;
+  max-width: 300px;
+  border-radius: 12px;
+}
+
+.shop-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .shop-layout { grid-template-columns: 1fr; }
+}
+
+.preview-box {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1 / 1;         /* квадратное окно */
+  border: 1px dashed var(--outline);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #faf7ff;
+}
+.preview-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.form-card label { display:block; margin-top: .5rem; font-weight: 500; }
+.form-card input[type="text"],
+.form-card select { width: 100%; padding: .5rem; margin-top: .25rem; border-radius: 8px; border: 1px solid var(--outline); }
+.actions { display: flex; gap: .5rem; margin-top: 1rem; }
+
+/* Нормализация расчёта ширины, чтобы инпуты не вылезали за карточку */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Единый стиль для полей формы на странице Магазин */
+.form-card {
+  display: grid;
+  gap: .75rem;
+}
 /* Остальные элементы... */
 .actions {
   display: block;

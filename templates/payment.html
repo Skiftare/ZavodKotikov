@@ -6,6 +6,16 @@
     <!-- Контейнер для уведомлений -->
     <div id="notification" class="notification"></div>
 
+    <!-- Таймер обратного отсчёта -->
+    <div class="payment-timer" id="paymentTimer">
+        <div class="timer-icon">⏱️</div>
+        <div class="timer-content">
+            <div class="timer-label">Время на оплату:</div>
+            <div class="timer-display" id="timerDisplay">--:--:--</div>
+            <div class="timer-hint" id="timerHint">Загрузка...</div>
+        </div>
+    </div>
+
     <div class="order-summary">
         <h3>Ваш заказ:</h3>
         <ul class="order-items">
@@ -19,16 +29,62 @@
         </ul>
 
         <div class="total">
-            <strong>Итого к оплате:</strong> {{ order.total_amount }} XML
+            <strong>Итого к оплате:</strong>
+
+            {{ order.total_amount }} XML
         </div>
     </div>
 
     <div class="payment-details">
+        {% if use_stellar %}
+        <div class="crypto-address">
+            <h4>Адрес Stellar для оплаты:</h4>
+            <code class="wallet">{{ stellar_address }}</code>
+            <button onclick="copyToClipboard('.wallet')" class="copy-btn">Копировать адрес</button>
+        </div>
+
+        <div class="memo-info">
+            <h4>⚠️ ВАЖНО: Укажите MEMO в транзакции!</h4>
+            <p>При отправке платежа обязательно укажите следующий текст в поле MEMO:</p>
+            <div class="memo-container">
+                <code class="memo" id="memoText">{{ order.memo }}</code>
+                <button onclick="copyToClipboard('.memo')" class="copy-btn">Копировать MEMO</button>
+                <button onclick="regenerateMemo()" class="regenerate-btn" id="regenerateBtn">
+                    🔄 Обновить MEMO
+                </button>
+            </div>
+            <div id="regenerateTimer" class="regenerate-timer" style="display: none;">
+                Следующее обновление через: <span id="timerSeconds">60</span> сек
+            </div>
+            <p class="warning-text">
+                <strong>Без правильного MEMO платёж не будет обработан!</strong><br>
+                Система автоматически проверит транзакцию в течение нескольких секунд.<br>
+                <small>MEMO защищён криптографически и меняется при каждой регенерации.</small>
+            </p>
+            <div class="memo-help">
+                💡 <strong>Совет:</strong> Если вам нужно больше времени на оплату, нажмите "Обновить MEMO"
+                для получения нового идентификатора (доступно раз в минуту).
+            </div>
+        </div>
+
+        <div class="payment-instructions">
+            <h4>Как оплатить:</h4>
+            <ol>
+                <li>Скопируйте адрес кошелька выше</li>
+                <li>Скопируйте MEMO (защищённый идентификатор платежа)</li>
+                <li>Откройте ваш Stellar кошелёк или <a href="https://laboratory.stellar.org/#txbuilder?network={{ stellar_network }}" target="_blank">Stellar Laboratory</a></li>
+                <li>Отправьте {{order.total_amount}} XLM на указанный адрес</li>
+                <li>Обязательно укажите MEMO: <code>{{ order.memo }}</code></li>
+                <li>После отправки дождитесь автоматического подтверждения</li>
+            </ol>
+        </div>
+        {% else %}
         <div class="crypto-address">
             <h4>Адрес для оплаты:</h4>
             <code class="wallet">XMLCoin_12345678abcdef</code>
             <button onclick="copyToClipboard('.wallet')" class="copy-btn">Копировать</button>
         </div>
+        {% endif %}
     </div>
 
     <form method="POST" action="{{ url_for('confirm_payment', order_id=order.id) }}" class="payment-form">
@@ -39,17 +95,32 @@
             <input type="email" id="email" name="email" required>
         </div>
 
+        {% if not use_stellar %}
         <div class="form-group">
-            <label for="transaction_id">ID транзакции:</label>
+            <label for="transaction_id">ID транзакции (для Mock: чётное число):</label>
             <input type="text" id="transaction_id" name="transaction_id" required>
             <small>Укажите ID транзакции после отправки XML</small>
         </div>
+        {% else %}
+        <input type="hidden" name="transaction_id" value="{{ order.id }}">
+        <div class="form-group">
+            <p class="info-text">
+                ℹ️ После отправки платежа с правильным MEMO, система автоматически обработает его.<br>
+                Вы можете нажать кнопку ниже, чтобы проверить статус платежа.
+            </p>
+        </div>
+        {% endif %}
 
-        <button type="submit" class="btn-confirm">Подтвердить оплату</button>
+        <button type="submit" class="btn-confirm">
+            {% if use_stellar %}Проверить статус оплаты{% else %}Подтвердить оплату{% endif %}
+        </button>
     </form>
 </div>
 
 <script>
+const ORDER_ID = "{{ order.id }}";
+const CSRF_TOKEN = "{{ csrf_token() }}";
+
 function showNotification(message, type = 'success') {
     const notification = document.getElementById('notification');
     notification.textContent = message;
@@ -63,11 +134,160 @@ function showNotification(message, type = 'success') {
 function copyToClipboard(selector) {
     const text = document.querySelector(selector).textContent;
     navigator.clipboard.writeText(text).then(() => {
-        showNotification('Адрес скопирован в буфер обмена!');
+        showNotification('Скопировано в буфер обмена!');
     }).catch(() => {
-        showNotification('Не удалось скопировать адрес', 'error');
+        showNotification('Не удалось скопировать', 'error');
     });
 }
+
+let memoRegenerateTime = 60;
+let memoRegenerateInterval = null;
+
+function startMemoRegenerateTimer() {
+    const timerElement = document.getElementById('timerSeconds');
+    const regenerateBtn = document.getElementById('regenerateBtn');
+    const regenerateTimer = document.getElementById('regenerateTimer');
+
+    regenerateBtn.disabled = true;
+    regenerateTimer.style.display = 'block';
+    timerElement.textContent = memoRegenerateTime;
+
+    if (memoRegenerateInterval) {
+        clearInterval(memoRegenerateInterval);
+    }
+
+    memoRegenerateInterval = setInterval(() => {
+        memoRegenerateTime--;
+        timerElement.textContent = memoRegenerateTime;
+
+        if (memoRegenerateTime <= 0) {
+            clearInterval(memoRegenerateInterval);
+            memoRegenerateInterval = null;
+            regenerateBtn.disabled = false;
+            regenerateTimer.style.display = 'none';
+            memoRegenerateTime = 60;
+        }
+    }, 1000);
+}
+
+// Таймер обратного отсчёта для оплаты
+let paymentTimerInterval = null;
+
+function startPaymentTimer(expiresAt) {
+    const display = document.getElementById('timerDisplay');
+    const hint = document.getElementById('timerHint');
+    const timerElement = document.getElementById('paymentTimer');
+
+    if (paymentTimerInterval) {
+        clearInterval(paymentTimerInterval);
+    }
+
+    function updateTimer() {
+        const now = new Date().getTime();
+        const expiry = new Date(expiresAt).getTime();
+        const remaining = Math.floor((expiry - now) / 1000);
+
+        if (remaining <= 0) {
+            display.textContent = '00:00:00';
+            hint.textContent = '⏰ Время истекло! Обновите MEMO для продления';
+            timerElement.style.background = '#ffebee';
+            timerElement.style.borderColor = '#ef5350';
+            clearInterval(paymentTimerInterval);
+            return;
+        }
+
+        const hours = Math.floor(remaining / 3600);
+        const minutes = Math.floor((remaining % 3600) / 60);
+        const seconds = remaining % 60;
+
+        display.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+        // Меняем цвет в зависимости от оставшегося времени
+        if (remaining < 300) { // Меньше 5 минут
+            display.style.color = '#e53935';
+            hint.textContent = '⚠️ Мало времени! Рекомендуем обновить MEMO';
+            timerElement.style.background = '#ffebee';
+        } else if (remaining < 600) { // Меньше 10 минут
+            display.style.color = '#fb8c00';
+            hint.textContent = '⏳ Осталось мало времени';
+            timerElement.style.background = '#fff3e0';
+        } else {
+            display.style.color = '#2e7d32';
+            hint.textContent = '✓ Достаточно времени для оплаты';
+            timerElement.style.background = '#f1f8e9';
+        }
+    }
+
+    updateTimer();
+    paymentTimerInterval = setInterval(updateTimer, 1000);
+}
+
+async function regenerateMemo() {
+    const regenerateBtn = document.getElementById('regenerateBtn');
+    const originalText = regenerateBtn.textContent;
+
+    // Блокируем кнопку
+    regenerateBtn.disabled = true;
+    regenerateBtn.textContent = '⏳ Обновление...';
+
+    try {
+        const response = await fetch(`/api/regenerate-memo/${ORDER_ID}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                csrf_token: CSRF_TOKEN
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            // Обновляем MEMO на странице
+            document.getElementById('memoText').textContent = data.memo;
+            showNotification(data.message || 'MEMO успешно обновлён!', 'success');
+
+            // Перезапускаем таймер оплаты с новым временем
+            if (data.expires_at) {
+                startPaymentTimer(data.expires_at);
+                showNotification('⏱️ Таймер обновлён! У вас есть ещё час', 'success');
+            }
+
+            // Запускаем таймер регенерации
+            memoRegenerateTime = 60;
+            startMemoRegenerateTimer();
+        } else {
+            // Показываем ошибку
+            showNotification(data.error || 'Не удалось обновить MEMO', 'error');
+            regenerateBtn.disabled = false;
+            regenerateBtn.textContent = originalText;
+        }
+    } catch (error) {
+        console.error('Error regenerating MEMO:', error);
+        showNotification('Ошибка соединения с сервером', 'error');
+        regenerateBtn.disabled = false;
+        regenerateBtn.textContent = originalText;
+    }
+}
+
+// Запускаем таймер обратного отсчёта при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    {% if order.memo_created_at %}
+    // Вычисляем время истечения на основе времени создания MEMO
+    const memoCreatedAt = new Date("{{ order.memo_created_at.isoformat() }}");
+    const paymentTimeout = {{ payment_timeout }};
+    const expiresAt = new Date(memoCreatedAt.getTime() + paymentTimeout * 1000);
+
+    // Запускаем таймер
+    startPaymentTimer(expiresAt.toISOString());
+    {% endif %}
+
+    // Даём пользователю возможность сразу регенерировать MEMO, если хочет
+    {% if use_stellar %}
+    document.getElementById('regenerateBtn').disabled = false;
+    {% endif %}
+});
 </script>
 
 <style>
@@ -143,9 +363,23 @@ function copyToClipboard(selector) {
     background: #f9f9f9;
     padding: 15px;
     border-radius: 5px;
+    margin-bottom: 20px;
 }
 
-.wallet {
+.memo-info {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.memo-info h4 {
+    color: #856404;
+    margin-top: 0;
+}
+
+.wallet, .memo {
     display: inline-block;
     padding: 10px;
     background: #fff;
@@ -153,6 +387,62 @@ function copyToClipboard(selector) {
     border-radius: 4px;
     margin: 10px 0;
     font-family: monospace;
+    word-break: break-all;
+}
+
+.memo {
+    background: #fff;
+    border: 2px solid #ffc107;
+    font-weight: bold;
+    color: #856404;
+}
+
+.warning-text {
+    color: #856404;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.info-text {
+    background: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+    padding: 12px;
+    border-radius: 4px;
+    margin: 0;
+}
+
+.payment-instructions {
+    background: #e7f3ff;
+    border: 1px solid #b3d9ff;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.payment-instructions h4 {
+    margin-top: 0;
+    color: #004085;
+}
+
+.payment-instructions ol {
+    margin-bottom: 0;
+}
+
+.payment-instructions li {
+    margin: 8px 0;
+}
+
+.payment-instructions code {
+    background: #fff;
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid #b3d9ff;
+}
+
+.payment-instructions a {
+    color: #004085;
+    text-decoration: underline;
 }
 
 .payment-form {
@@ -211,12 +501,107 @@ function copyToClipboard(selector) {
     background: #0056b3;
 }
 
+.regenerate-btn {
+    margin-left: 10px;
+    padding: 8px 16px;
+    background: #ffc107;
+    color: #333;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.regenerate-btn:hover:not(:disabled) {
+    background: #e0a800;
+    transform: translateY(-1px);
+}
+
+.regenerate-btn:disabled {
+    background: #ddd;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.regenerate-timer {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #856404;
+    font-weight: 500;
+}
+
+.memo-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.memo-help {
+    background: #d1ecf1;
+    border-left: 4px solid #17a2b8;
+    padding: 12px;
+    margin-top: 15px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #0c5460;
+}
+
+.memo-help strong {
+    color: #0c5460;
+}
+
+/* Таймер обратного отсчёта */
+.payment-timer {
+    background: #f1f8e9;
+    border: 1px solid #c8e6c9;
+    padding: 15px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.timer-icon {
+    font-size: 24px;
+    color: #4caf50;
+    margin-right: 10px;
+}
+
+.timer-content {
+    flex-grow: 1;
+}
+
+.timer-label {
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.timer-display {
+    font-size: 22px;
+    font-weight: bold;
+    color: #e53935;
+}
+
+.timer-hint {
+    font-size: 14px;
+    color: #666;
+}
+
 /* Адаптив для мобильных */
 @media (max-width: 600px) {
     .notification {
         right: 10px;
         left: 10px;
         max-width: none;
+    }
+
+    .copy-btn, .regenerate-btn {
+        display: block;
+        margin: 10px 0;
+        width: 100%;
     }
 }
 </style>
