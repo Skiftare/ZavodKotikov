@@ -1,14 +1,6 @@
-Flask>=2.0.0
-Werkzeug>=2.0.0
-Pillow>=9.0.0
-py-stellar-base>=8.0.0
-python-dotenv>=0.19.0
+Flask
+Werkzeug
+Pillow
+stellar-sdk
+python-dotenv
 # Stellar Configuration
-STELLAR_NETWORK=testnet  # testnet or mainnet
-STELLAR_DESTINATION_ADDRESS=YOUR_STELLAR_ADDRESS_HERE
-STELLAR_HORIZON_URL=https://horizon-testnet.stellar.org  # or https://horizon.stellar.org for mainnet
-
-# Payment Check Settings
-PAYMENT_CHECK_INTERVAL=10  # seconds between checks
-PAYMENT_TIMEOUT=3600  # seconds (1 hour) before payment considered expired
-
