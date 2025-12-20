@@ -1,25 +1,141 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h2>Корзина</h2>
+<div class="container">
+    <h2 class="page-title">Ваша корзина</h2>
 
-{% if orders and orders|length %}
-<ul>
-    {% for cat in orders %}
-    <li>
-        <img src="{{ cat.image }}" alt="{{ cat.name }}"
-             style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; vertical-align: middle;">
+    {% if orders and orders|length %}
+    <form method="POST" action="{{ url_for('checkout') }}" id="cartForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-        {{ cat.name }} — Порода: {{ cat.breed }}, Цвет: {{ cat.color }},
-        Ушки: {{ cat.ears }}, Лапки: {{ cat.paws }}
-    </li>
-    {% endfor %}
-</ul>
+        <!-- Панель управления -->
+        <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+            <label style="cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" id="selectAll" checked style="width: 1.2rem; height: 1.2rem;">
+                Выбрать всех
+            </label>
+            <div style="font-size: 1.2rem;">
+                Итого: <span id="totalPrice" style="font-weight: 700; color: var(--primary);">0</span> XML
+            </div>
+        </div>
 
-<form method="POST" action="{{ url_for('checkout') }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <button type="submit">Оформить заказ</button>
-</form>
-{% else %}
-<p>Ваша корзина пуста.</p>
-{% endif %}
+        <!-- Список товаров (вертикальный стек) -->
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            {% for cat in orders %}
+            <div class="card cart-item" style="display: flex; flex-direction: row; align-items: center; gap: 1.5rem; padding: 1rem;">
+
+                <!-- 1. Чекбокс (слева) -->
+                <div style="display: flex; align-items: center;">
+                    <input type="checkbox"
+                           name="selected_indices"
+                           value="{{ loop.index0 }}"
+                           class="item-checkbox"
+                           checked
+                           data-price="{{ cat.price.split()[0] }}"
+                           style="width: 1.5rem; height: 1.5rem; cursor: pointer;">
+                </div>
+
+                <!-- 2. Картинка (фиксированный размер, слева после чекбокса) -->
+                <div class="preview-box" style="width: 120px; height: 120px; flex-shrink: 0; border-radius: 8px; overflow: hidden; border: 1px solid var(--outline); background: #fff; display: flex; align-items: center; justify-content: center;">
+                    <img src="{{ cat.image }}" alt="{{ cat.name }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                </div>
+
+                <!-- 3. Описание (посередине, занимает всё свободное место) -->
+                <div style="flex-grow: 1;">
+                    <h3 style="margin: 0 0 0.5rem 0; font-size: 1.4rem;">{{ cat.name }}</h3>
+                    <div style="font-size: 0.9rem; color: var(--on-surface); opacity: 0.8; line-height: 1.5; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.2rem;">
+                        <div><strong>Порода:</strong> {{ cat.breed }}</div>
+                        <div><strong>Цвет:</strong> {{ cat.color }}</div>
+                        <div><strong>Ушки:</strong> {{ cat.ears }}</div>
+                        <div><strong>Лапки:</strong> {{ cat.paws }}</div>
+                        <div><strong>Паттерн:</strong> {{ cat.pattern }}</div>
+                    </div>
+                </div>
+
+                <!-- 4. Цена (справа) -->
+                <div class="price-box" style="text-align: center; min-width: 120px; margin: 0; flex-shrink: 0;">
+                    <div class="price-value">{{ cat.price }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Кнопка оплаты -->
+        <div style="margin-top: 2rem; text-align: right;">
+            <button type="submit" class="btn btn--lg" id="checkoutBtn" style="background: var(--primary); color: var(--on-primary); padding: 1rem 3rem;">
+                Оплатить выбранное
+            </button>
+        </div>
+    </form>
+
+    {% else %}
+    <div class="custom-rectangle2">
+        <div>
+            <h3>Ваша корзина пуста</h3>
+            <p>Самое время создать уникального котика!</p>
+            <a href="{{ url_for('shop') }}" class="btn" style="margin-top: 1rem; display: inline-block;">В магазин</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.item-checkbox');
+    const selectAll = document.getElementById('selectAll');
+    const totalDisplay = document.getElementById('totalPrice');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+
+    function calculateTotal() {
+        let total = 0;
+        let checkedCount = 0;
+
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                total += parseInt(cb.dataset.price || 0);
+                checkedCount++;
+            }
+        });
+
+        totalDisplay.textContent = total;
+
+        if (checkoutBtn) {
+            if (checkedCount === 0) {
+                checkoutBtn.disabled = true;
+                checkoutBtn.style.opacity = '0.5';
+                checkoutBtn.style.cursor = 'not-allowed';
+            } else {
+                checkoutBtn.disabled = false;
+                checkoutBtn.style.opacity = '1';
+                checkoutBtn.style.cursor = 'pointer';
+            }
+        }
+    }
+
+    // Обработчик "Выбрать всех"
+    if (selectAll) {
+        selectAll.addEventListener('change', function() {
+            checkboxes.forEach(cb => {
+                cb.checked = selectAll.checked;
+            });
+            calculateTotal();
+        });
+    }
+
+    // Обработчики для отдельных чекбоксов
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+            calculateTotal();
+            if (!this.checked && selectAll) {
+                selectAll.checked = false;
+            }
+            if (selectAll && document.querySelectorAll('.item-checkbox:checked').length === checkboxes.length) {
+                selectAll.checked = true;
+            }
+        });
+    });
+
+    calculateTotal();
+});
+</script>
 {% endblock %}

@@ -43,5 +43,19 @@
     </footer>
 
 {% block scripts %}{% endblock %}
+
+<script>
+    // Скрипт автоматической прокрутки баннера
+    window.addEventListener('load', function() {
+        // Проверяем через Jinja, что мы НЕ на главной странице
+        {% if request.endpoint != 'index' %}
+            const banner = document.querySelector('.header-banner');
+            if (banner) {
+                // Прокручиваем на высоту баннера
+                window.scrollTo(0, banner.offsetHeight);
+            }
+        {% endif %}
+    });
+</script>
 </body>
 </html>

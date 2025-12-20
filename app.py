@@ -243,15 +243,32 @@ def checkout():
         flash("Корзина пуста", "error")
         return redirect(url_for("account"))
 
+    # Получаем список индексов, которые выбрал пользователь
+    selected_indices_raw = request.form.getlist("selected_indices")
+
+    if not selected_indices_raw:
+        flash("Выберите хотя бы одного кота для оплаты", "warning")
+        return redirect(url_for("account"))
+
     # Убедимся что у нас есть session_id
     if "session_id" not in session:
         session["session_id"] = str(uuid.uuid4())
 
     try:
-        app.logger.info(f"Создаём заказ из корзины: {session['orders']}")
+        # Преобразуем индексы в int
+        selected_indices = [int(i) for i in selected_indices_raw]
+        all_orders = session["orders"]
+
+        # Фильтруем котов по индексам
+        cats_to_buy = []
+        for i in selected_indices:
+            if 0 <= i < len(all_orders):
+                cats_to_buy.append(all_orders[i])
+
+        app.logger.info(f"Создаём заказ из корзины (выбрано {len(cats_to_buy)}): {cats_to_buy}")
 
         items = []
-        for cat in session["orders"]:
+        for cat in cats_to_buy:
             price = int(cat["price"].split()[0])
             items.append(
                 OrderItem(
@@ -316,6 +333,7 @@ def confirm_payment(order_id):
     if not email or not transaction_id:
         flash("Необходимо заполнить все поля", "error")
         return redirect(url_for("payment_page", order_id=order_id))
+
 
     try:
         status = order_service.process_payment(order_id, session["session_id"], transaction_id)
