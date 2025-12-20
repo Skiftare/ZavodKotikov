@@ -15,12 +15,25 @@
   font-family: 'Comfortaa', cursive;
 }
 
+/* 1. Предотвращаем скачок из-за появления скроллбара */
+html {
+  overflow-y: scroll;
+}
+
+/* 2. Анимация для плавного появления контента */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 body {
   margin: 0;
   font-family: 'Comfortaa', cursive;
   background: var(--background);
   color: var(--on-surface);
   min-width: 1400px;
+  /* Применяем анимацию */
+  animation: fadeIn 0.5s ease-out;
 }
 
 .container {
